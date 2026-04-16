@@ -1,0 +1,205 @@
+<div class="panel-card">
+  <div class="panel-header">
+    <div class="panel-header-title">
+      <h1 class="panel-title">Asignaciones</h1>
+    </div>
+    <div class="panel-header-actions">
+      <button type="button" class="btn-add btn-add--excel" (click)="descargarExcel()">
+        <i class="pi pi-download"></i>
+        Descargar Excel
+      </button>
+      <button type="button" class="btn-add" (click)="abrirDialogoAsignacion()">
+        <i class="pi pi-plus"></i>
+        Registrar nueva asignación
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>Buscar asignación</label>
+      <div class="search-input-wrap">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          pInputText
+          appCapitalizeFirst
+          [(ngModel)]="busqueda"
+          (ngModelChange)="filtrar()"
+          placeholder="Buscar por palabra"
+        />
+      </div>
+    </div>
+  </div>
+
+  <p-table
+    [value]="asignacionesFiltradas"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    responsiveLayout="scroll"
+    styleClass="panel-table"
+    [tableStyle]="{ 'min-width': '50rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Empleado</th>
+        <th>Activo</th>
+        <th>Fecha de asignación</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-asignacion>
+      <tr>
+        <td>
+          <span class="avatar-iniciales">{{ iniciales(asignacion.empleado.nombre) }}</span>
+          {{ asignacion.empleado.nombre }}
+        </td>
+        <td>{{ asignacion.activo.tipo }} - {{ asignacion.activo.marca }}</td>
+        <td>{{ asignacion.fechaAsignacion | date:'shortDate' }}</td>
+        <td>
+          <span class="estado-badge" [ngClass]="asignacion.activo.estado?.toLowerCase()">
+            <span class="dot"></span>
+            {{ asignacion.activo.estado }}
+          </span>
+        </td>
+        <td>
+          <div class="table-actions">
+            <button type="button" title="Ver" (click)="verAsignacion(asignacion)">
+              <i class="pi pi-eye"></i>
+            </button>
+            <button
+              type="button"
+              title="Editar"
+              (click)="editarAsignacion(asignacion)"
+            >
+              <i class="pi pi-pencil"></i>
+            </button>
+            <button
+              type="button"
+              title="Eliminar"
+              (click)="solicitarEliminarAsignacion(asignacion)"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5">No hay asignaciones registradas.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<app-form-nueva-asignacion
+  [visible]="mostrarDialogo"
+  (visibleChange)="onDialogoAsignacionVisible($event)"
+  [empleados]="empleados"
+  [activos]="activos"
+  [asignacionEditar]="asignacionEnEdicion"
+  [prealtaIds]="prealtaNuevaAsignacion"
+  [errorAsignacion]="errorAsignacion"
+  (submitForm)="onAsignacionGuardada($event)"
+/>
+
+<p-dialog
+  header="Detalle de asignación"
+  [(visible)]="mostrarDetalleAsignacion"
+  [modal]="true"
+  [style]="{ width: '620px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="detalle-asignacion-dialog"
+  (onHide)="cerrarDetalleAsignacion()"
+>
+  @if (asignacionDetalle) {
+    <div class="detalle-asignacion">
+      <div class="detalle-seccion">
+        <h3>Empleado</h3>
+        <p><strong>Nombre:</strong> {{ asignacionDetalle.empleado.nombre }}</p>
+        <p><strong>Cargo:</strong> {{ asignacionDetalle.empleado.cargo || '—' }}</p>
+        <p><strong>Área:</strong> {{ asignacionDetalle.empleado.area || '—' }}</p>
+      </div>
+
+      <div class="detalle-seccion">
+        <h3>Activo</h3>
+        <p><strong>Tipo:</strong> {{ asignacionDetalle.activo.tipo }}</p>
+        <p><strong>Marca:</strong> {{ asignacionDetalle.activo.marca }}</p>
+        <p><strong>Modelo:</strong> {{ asignacionDetalle.activo.modelo }}</p>
+        <p><strong>Serial:</strong> {{ asignacionDetalle.activo.serial }}</p>
+      </div>
+
+      <div class="detalle-seccion detalle-seccion--full">
+        <h3>Asignación</h3>
+        <p><strong>Fecha:</strong> {{ asignacionDetalle.fechaAsignacion | date:'medium' }}</p>
+        <div class="estado-detalle-bloque">
+          <strong>Estado del activo:</strong>
+          <span class="estado-detalle-wrap">
+            <button
+              pButton
+              type="button"
+              class="btn-estado btn-estado-selected"
+              [label]="asignacionDetalle.activo.estado || 'SIN ESTADO'"
+              [attr.data-estado]="asignacionDetalle.activo.estado || 'SIN_ESTADO'"
+              [disabled]="true"
+            ></button>
+          </span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cerrar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cerrarDetalleAsignacion()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Confirmar eliminación"
+  [(visible)]="mostrarConfirmarEliminacion"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ width: '500px', maxWidth: '95vw' }"
+  styleClass="confirm-eliminar-dialog"
+  (onHide)="cancelarEliminarAsignacion()"
+>
+  <p class="confirm-eliminar-texto">
+    Vas a eliminar la asignación de
+    <strong>{{ asignacionAEliminar?.empleado?.nombre }}</strong>
+    para el activo
+    <strong>{{ asignacionAEliminar?.activo?.tipo }} - {{ asignacionAEliminar?.activo?.marca }}</strong>.
+    Esta acción no se puede deshacer.
+  </p>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cancelarEliminarAsignacion()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Eliminar"
+      icon="pi pi-trash"
+      class="p-button-danger btn-dialog btn-dialog-danger"
+      (click)="confirmarEliminarAsignacion()"
+    ></button>
+  </ng-template>
+</p-dialog>

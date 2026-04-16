@@ -1,0 +1,161 @@
+<div class="perfil-page">
+  <h1 class="perfil-page-title">Mi perfil</h1>
+
+  <div class="perfil-grid">
+    <section class="panel-card perfil-card">
+      <h2 class="perfil-card-title">Foto de perfil</h2>
+      <p class="perfil-card-desc">Sube una imagen o cámbiala cuando quieras. Se guarda en este navegador (demo sin servidor).</p>
+
+      @if (avatarError) {
+        <p class="msg msg-error">{{ avatarError }}</p>
+      }
+      @if (avatarOk) {
+        <p class="msg msg-ok">{{ avatarOk }}</p>
+      }
+
+      <div class="avatar-block">
+        <div class="avatar-preview">
+          @if (auth.session()?.avatarUrl) {
+            <img [src]="auth.session()?.avatarUrl" alt="Foto de perfil" />
+          } @else {
+            <i class="pi pi-user" aria-hidden="true"></i>
+          }
+        </div>
+        <div class="avatar-actions">
+          <input
+            #fileInput
+            type="file"
+            class="sr-only"
+            accept="image/*"
+            (change)="onAvatarSelected($event)"
+          />
+          <button
+            pButton
+            type="button"
+            label="Subir imagen"
+            icon="pi pi-upload"
+            class="p-button-outlined btn-perfil"
+            (click)="fileInput.click()"
+          ></button>
+          @if (auth.session()?.avatarUrl) {
+            <button
+              pButton
+              type="button"
+              label="Quitar foto"
+              icon="pi pi-trash"
+              class="p-button-secondary btn-perfil btn-perfil-muted"
+              (click)="quitarAvatar()"
+            ></button>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="panel-card perfil-card">
+      <h2 class="perfil-card-title">Contraseña de acceso</h2>
+      <p class="perfil-card-desc">Cambia la contraseña con la que inicias sesión.</p>
+
+      @if (passError) {
+        <p class="msg msg-error">{{ passError }}</p>
+      }
+      @if (passOk) {
+        <p class="msg msg-ok">{{ passOk }}</p>
+      }
+
+      <div class="pass-fields">
+        <div class="pass-field">
+          <label for="pass-actual">Contraseña actual</label>
+          <div class="pass-input-wrap">
+            <input
+              id="pass-actual"
+              pInputText
+              [type]="mostrarPassActual ? 'text' : 'password'"
+              [(ngModel)]="passActual"
+              autocomplete="current-password"
+              class="pass-input"
+            />
+            <button
+              type="button"
+              class="pass-toggle"
+              [attr.aria-label]="mostrarPassActual ? 'Ocultar' : 'Mostrar'"
+              (click)="togglePass('actual')"
+            >
+              <i class="pi" [ngClass]="mostrarPassActual ? 'pi-eye-slash' : 'pi-eye'"></i>
+            </button>
+          </div>
+        </div>
+        <div class="pass-field">
+          <label for="pass-nueva">Nueva contraseña</label>
+          <div class="pass-input-wrap">
+            <input
+              id="pass-nueva"
+              pInputText
+              [type]="mostrarPassNueva ? 'text' : 'password'"
+              [(ngModel)]="passNueva"
+              autocomplete="new-password"
+              class="pass-input"
+            />
+            <button
+              type="button"
+              class="pass-toggle"
+              [attr.aria-label]="mostrarPassNueva ? 'Ocultar' : 'Mostrar'"
+              (click)="togglePass('nueva')"
+            >
+              <i class="pi" [ngClass]="mostrarPassNueva ? 'pi-eye-slash' : 'pi-eye'"></i>
+            </button>
+          </div>
+        </div>
+        <div class="pass-field">
+          <label for="pass-confirmar">Confirmar nueva contraseña</label>
+          <div class="pass-input-wrap">
+            <input
+              id="pass-confirmar"
+              pInputText
+              [type]="mostrarPassConfirmar ? 'text' : 'password'"
+              [(ngModel)]="passConfirmar"
+              autocomplete="new-password"
+              class="pass-input"
+            />
+            <button
+              type="button"
+              class="pass-toggle"
+              [attr.aria-label]="mostrarPassConfirmar ? 'Ocultar' : 'Mostrar'"
+              (click)="togglePass('confirmar')"
+            >
+              <i class="pi" [ngClass]="mostrarPassConfirmar ? 'pi-eye-slash' : 'pi-eye'"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pass-submit">
+        <button
+          pButton
+          type="button"
+          label="Guardar contraseña"
+          icon="pi pi-check"
+          class="p-button-info btn-perfil-primary"
+          (click)="guardarContrasena()"
+        ></button>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel-card perfil-card perfil-card-datos">
+    <h2 class="perfil-card-title">Datos de la cuenta</h2>
+    <div class="perfil-datos">
+      <div class="perfil-row">
+        <span class="perfil-label">Usuario</span>
+        <span class="perfil-value">{{ auth.session()?.username ?? '—' }}</span>
+      </div>
+      <div class="perfil-row">
+        <span class="perfil-label">Nombre</span>
+        <span class="perfil-value">{{ auth.session()?.nombre ?? '—' }}</span>
+      </div>
+      <div class="perfil-row">
+        <span class="perfil-label">Rol</span>
+        <span class="perfil-value">{{ auth.session()?.rol ?? '—' }}</span>
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,251 @@
+﻿<div class="panel-card">
+  <div class="panel-header">
+    <div class="panel-header-title">
+      <h1 class="panel-title">Solicitudes pendientes</h1>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>Buscar solicitud</label>
+      <div class="search-input-wrap">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="busqueda"
+          (ngModelChange)="filtrar()"
+          placeholder="Buscar por empleado, activo o serial"
+        />
+      </div>
+    </div>
+  </div>
+
+  <p-table
+    [value]="solicitudesFiltradas"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    responsiveLayout="scroll"
+    styleClass="panel-table"
+    [tableStyle]="{ 'min-width': '65rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Funcionario</th>
+        <th>Activo</th>
+        <th>Serial</th>
+        <th>Estado</th>
+        <th>Fecha solicitud</th>
+        <th>Motivo</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-solicitud>
+      <tr [class]="'fila-solicitud fila-solicitud--' + claseEstadoFila(solicitud)">
+        <td>{{ solicitud.empleado?.nombre }}</td>
+        <td>{{ solicitud.activo?.tipo }} - {{ solicitud.activo?.marca }}</td>
+        <td>{{ solicitud.activo?.serial }}</td>
+        <td>
+          <span [class]="'estado-solicitud-chip estado-solicitud-chip--' + claseEstadoFila(solicitud)">
+            {{ etiquetaEstado(solicitud) }}
+          </span>
+        </td>
+        <td>{{ solicitud.fechaSolicitud | date:'short' }}</td>
+        <td>{{ solicitud.motivo != null && solicitud.motivo !== '' ? solicitud.motivo : '—' }}</td>
+        <td>
+          <div class="table-actions">
+            <button type="button" class="action-view" title="Ver detalle" (click)="verDetalle(solicitud)">
+              <i class="pi pi-eye"></i>
+            </button>
+            @if (esPuedeIrACrearAsignacion(solicitud)) {
+              <button
+                type="button"
+                class="action-asignacion"
+                title="Ir a crear asignación"
+                (click)="irACrearAsignacion(solicitud)"
+              >
+                <i class="pi pi-link"></i>
+              </button>
+            }
+            @if (esPendiente(solicitud)) {
+              <button type="button" class="action-approve" title="Aprobar" (click)="abrirAprobar(solicitud)">
+                <i class="pi pi-check"></i>
+              </button>
+              <button type="button" class="action-reject" title="Rechazar" (click)="abrirRechazar(solicitud)">
+                <i class="pi pi-times"></i>
+              </button>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">No hay solicitudes registradas.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  header="Detalle de solicitud"
+  [(visible)]="mostrarDetalle"
+  [modal]="true"
+  [style]="{ width: '620px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="detalle-solicitud-admin-dialog"
+  (onHide)="cerrarDetalle()"
+>
+  @if (solicitudDetalle) {
+    <div class="detalle-solicitud">
+      <div class="detalle-seccion">
+        <h3>Funcionario</h3>
+        <p><strong>Nombre:</strong> {{ solicitudDetalle.empleado.nombre }}</p>
+        <p><strong>Cargo:</strong> {{ solicitudDetalle.empleado.cargo || '�' }}</p>
+        <p><strong>�rea:</strong> {{ solicitudDetalle.empleado.area || '�' }}</p>
+      </div>
+      <div class="detalle-seccion">
+        <h3>Activo solicitado</h3>
+        <p><strong>Tipo:</strong> {{ solicitudDetalle.activo.tipo }}</p>
+        <p><strong>Marca:</strong> {{ solicitudDetalle.activo.marca }}</p>
+        <p><strong>Modelo:</strong> {{ solicitudDetalle.activo.modelo || '�' }}</p>
+        <p><strong>Serial:</strong> {{ solicitudDetalle.activo.serial || '�' }}</p>
+        <p><strong>Estado actual:</strong> {{ solicitudDetalle.activo.estado }}</p>
+      </div>
+      <div class="detalle-seccion detalle-seccion--full">
+        <h3>Solicitud</h3>
+        <p><strong>Estado:</strong> {{ etiquetaEstado(solicitudDetalle) }}</p>
+        <p><strong>Fecha solicitud:</strong> {{ solicitudDetalle.fechaSolicitud | date:'medium' }}</p>
+        @if (solicitudDetalle.fechaRespuesta) {
+          <p><strong>Fecha respuesta:</strong> {{ solicitudDetalle.fechaRespuesta | date:'medium' }}</p>
+        }
+        <p><strong>Motivo:</strong> {{ solicitudDetalle.motivo || '�' }}</p>
+        @if (solicitudDetalle.comentarioAdmin) {
+          <p><strong>Comentario administrativo:</strong> {{ solicitudDetalle.comentarioAdmin }}</p>
+        }
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cerrar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cerrarDetalle()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Aprobar solicitud"
+  [(visible)]="mostrarConfirmarAprobar"
+  [modal]="true"
+  [style]="{ width: '560px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  styleClass="procesar-solicitud-dialog"
+>
+  <div class="dialog-form">
+    <p class="confirm-text">
+      �Deseas aprobar la solicitud de
+      <strong>{{ solicitudEnProceso?.empleado?.nombre }}</strong>
+      para el activo
+      <strong>{{ solicitudEnProceso?.activo?.tipo }} - {{ solicitudEnProceso?.activo?.marca }}</strong>?
+    </p>
+    <div class="form-field">
+      <label for="aprobar-comentario">Comentario administrativo (opcional)</label>
+      <textarea
+        id="aprobar-comentario"
+        pInputText
+        rows="3"
+        maxlength="500"
+        [(ngModel)]="comentarioAdmin"
+        placeholder="Ej: aprobado para gesti�n inmediata"
+      ></textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      [disabled]="procesando"
+      (click)="cerrarAprobar()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Aprobar"
+      icon="pi pi-check"
+      class="p-button-info btn-dialog btn-dialog-primary"
+      [loading]="procesando"
+      [disabled]="procesando"
+      (click)="confirmarAprobar()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Rechazar solicitud"
+  [(visible)]="mostrarConfirmarRechazar"
+  [modal]="true"
+  [style]="{ width: '560px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  styleClass="procesar-solicitud-dialog"
+>
+  <div class="dialog-form">
+    <p class="confirm-text">
+      �Deseas rechazar la solicitud de
+      <strong>{{ solicitudEnProceso?.empleado?.nombre }}</strong>
+      para el activo
+      <strong>{{ solicitudEnProceso?.activo?.tipo }} - {{ solicitudEnProceso?.activo?.marca }}</strong>?
+    </p>
+    <div class="form-field">
+      <label for="rechazar-comentario">Motivo del rechazo (obligatorio)</label>
+      <textarea
+        id="rechazar-comentario"
+        pInputText
+        rows="3"
+        maxlength="500"
+        [(ngModel)]="comentarioAdmin"
+        placeholder="Escribe el motivo del rechazo"
+      ></textarea>
+      @if (mostrarErrorComentarioRechazo) {
+        <small class="field-error">Escribe el motivo del rechazo.</small>
+      }
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      [disabled]="procesando"
+      (click)="cerrarRechazar()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Rechazar"
+      icon="pi pi-times"
+      class="p-button-danger btn-dialog btn-dialog-danger"
+      [loading]="procesando"
+      [disabled]="procesando"
+      (click)="confirmarRechazar()"
+    ></button>
+  </ng-template>
+</p-dialog>

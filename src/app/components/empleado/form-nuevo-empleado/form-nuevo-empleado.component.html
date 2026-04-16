@@ -1,0 +1,125 @@
+<p-dialog
+  [header]="tituloDialogo"
+  [(visible)]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [style]="{ width: '560px' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="cerrar()"
+>
+  <form
+    id="formNuevoEmpleado"
+    #formEmpleado="ngForm"
+    class="dialog-form"
+    (ngSubmit)="enviar()"
+    novalidate
+    autocomplete="off"
+  >
+    <div class="form-field form-field-full">
+      <label for="fe-nombre">Nombre y Apellido</label>
+      <input
+        id="fe-nombre"
+        pInputText
+        appCapitalizeFirst
+        type="text"
+        name="nombre"
+        [(ngModel)]="form.nombre"
+        required
+        minlength="2"
+        maxlength="200"
+        [attr.pattern]="'.*\\S.*'"
+        #nombreCtrl="ngModel"
+        placeholder="Ej. Juan Pérez"
+      />
+      @if (nombreCtrl.invalid && nombreCtrl.touched) {
+        <small class="field-error" role="alert">
+          @if (nombreCtrl.errors?.['required']) {
+            El nombre es obligatorio.
+          } @else if (nombreCtrl.errors?.['minlength']) {
+            Mínimo 2 caracteres.
+          } @else if (nombreCtrl.errors?.['pattern']) {
+            No uses solo espacios.
+          }
+        </small>
+      }
+    </div>
+    <div class="form-field form-field-full estado-buttons">
+      <label for="fe-cargo">Cargo</label>
+      <input
+        id="fe-cargo"
+        type="hidden"
+        name="cargo"
+        [(ngModel)]="form.cargo"
+        required
+        #cargoCtrl="ngModel"
+      />
+      <div
+        class="estado-buttons-wrap"
+        [class.estado-invalid]="cargoCtrl.invalid && cargoCtrl.touched"
+      >
+        <button
+          *ngFor="let opt of cargos"
+          pButton
+          type="button"
+          [label]="opt.label"
+          [class.btn-estado]="true"
+          [class.btn-estado-selected]="form.cargo === opt.value"
+          [attr.data-cargo]="opt.value"
+          (click)="form.cargo = opt.value"
+        ></button>
+      </div>
+      @if (cargoCtrl.invalid && cargoCtrl.touched) {
+        <small class="field-error" role="alert">Selecciona un cargo.</small>
+      }
+    </div>
+    <div class="form-field form-field-full estado-buttons">
+      <label for="fe-area">Área</label>
+      <input
+        id="fe-area"
+        type="hidden"
+        name="area"
+        [(ngModel)]="form.area"
+        required
+        #areaCtrl="ngModel"
+      />
+      <div
+        class="estado-buttons-wrap"
+        [class.estado-invalid]="areaCtrl.invalid && areaCtrl.touched"
+      >
+        <button
+          *ngFor="let opt of areas"
+          pButton
+          type="button"
+          [label]="opt.label"
+          [class.btn-estado]="true"
+          [class.btn-estado-selected]="form.area === opt.value"
+          [attr.data-area]="opt.value"
+          (click)="form.area = opt.value"
+        ></button>
+      </div>
+      @if (areaCtrl.invalid && areaCtrl.touched) {
+        <small class="field-error" role="alert">Selecciona un área.</small>
+      }
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cerrar()"
+    ></button>
+    <button
+      pButton
+      type="submit"
+      form="formNuevoEmpleado"
+      [label]="etiquetaBotonEnviar"
+      icon="pi pi-check"
+      class="p-button-info btn-dialog btn-dialog-primary"
+      [disabled]="!formEmpleado?.valid"
+    ></button>
+  </ng-template>
+</p-dialog>

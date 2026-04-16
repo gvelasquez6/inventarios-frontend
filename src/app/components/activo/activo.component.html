@@ -1,0 +1,148 @@
+<div class="panel-card">
+  <div class="panel-header">
+    <div class="panel-header-title">
+      <h1 class="panel-title">Activos</h1>
+    </div>
+    <div class="panel-header-actions">
+      <button type="button" class="btn-add" (click)="abrirDialogoNuevo()">
+        <i class="pi pi-plus"></i>
+        Agregar nuevo activo
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>Buscar activo</label>
+      <div class="search-input-wrap">
+        <i class="pi pi-search"></i>
+        <input type="text" pInputText appCapitalizeFirst [(ngModel)]="busqueda" (ngModelChange)="filtrar()"
+          placeholder="Buscar por palabra" />
+      </div>
+    </div>
+    <div class="filter-group dropdown-wrap">
+      <label>Estado</label>
+      <p-select [options]="opcionesEstado" [(ngModel)]="estadoFiltro" (ngModelChange)="filtrar()" optionLabel="label"
+        optionValue="value" placeholder="Todas" [showClear]="true" styleClass="w-full estado-filter-select"
+        panelStyleClass="estado-filter-panel" />
+    </div>
+  </div>
+
+  <p-table [value]="activosFiltrados" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5, 10, 20]"
+    responsiveLayout="scroll" styleClass="panel-table" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Tipo</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>Serial</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-activo>
+      <tr>
+        <td>
+          <span class="avatar-icon"><i class="pi pi-box"></i></span>
+          {{ activo.tipo }}
+        </td>
+        <td>{{ activo.marca }}</td>
+        <td>{{ activo.modelo }}</td>
+        <td>{{ activo.serial }}</td>
+        <td>
+          <span class="estado-badge" [ngClass]="activo.estado?.toLowerCase()">
+            <span class="dot"></span>
+            {{ activo.estado }}
+          </span>
+        </td>
+        <td>
+          <div class="table-actions">
+            <button type="button" title="Ver" (click)="verActivo(activo)">
+              <i class="pi pi-eye"></i>
+            </button>
+            <button type="button" title="Editar" (click)="abrirDialogoEditar(activo)">
+              <i class="pi pi-pencil"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6">No hay activos registrados.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<app-form-nuevo-activo
+  [visible]="mostrarDialogo"
+  (visibleChange)="onDialogoActivoVisible($event)"
+  [activoEditar]="activoEnEdicion"
+  (submitForm)="onActivoAgregado($event)"
+/>
+
+<p-dialog
+  header="Detalle de activo"
+  [(visible)]="mostrarDetalleActivo"
+  [modal]="true"
+  [style]="{ width: '470px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="detalle-activo-dialog"
+  (onHide)="cerrarDetalleActivo()"
+>
+  @if (activoDetalle) {
+    <div class="detalle-activo">
+      <div class="detalle-seccion detalle-seccion--full">
+        <h3>Información general</h3>
+        <p><strong>Tipo:</strong> {{ activoDetalle.tipo }}</p>
+        <p><strong>Marca:</strong> {{ activoDetalle.marca }}</p>
+        <p><strong>Modelo:</strong> {{ activoDetalle.modelo }}</p>
+        <p><strong>Serial:</strong> {{ activoDetalle.serial }}</p>
+        <div class="estado-detalle-bloque">
+          <strong>Estado:</strong>
+          <span class="estado-detalle-wrap">
+            <button
+              pButton
+              type="button"
+              class="btn-estado btn-estado-selected"
+              [label]="activoDetalle.estado || 'SIN ESTADO'"
+              [attr.data-estado]="activoDetalle.estado || 'SIN_ESTADO'"
+              [disabled]="true"
+            ></button>
+          </span>
+        </div>
+        <div class="detalle-asignacion-bloque">
+          <strong>Funcionario asignado:</strong>
+          @if (funcionarioAsignadoDetalle) {
+            <p>
+              {{ funcionarioAsignadoDetalle.nombre }}
+              @if (funcionarioAsignadoDetalle.cargo || funcionarioAsignadoDetalle.area) {
+                <span>
+                  (
+                  {{ funcionarioAsignadoDetalle.cargo || 'Sin cargo' }} ·
+                  {{ funcionarioAsignadoDetalle.area || 'Sin área' }}
+                  )
+                </span>
+              }
+            </p>
+          } @else {
+            <p>Sin asignación registrada.</p>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cerrar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cerrarDetalleActivo()"
+    ></button>
+  </ng-template>
+</p-dialog>

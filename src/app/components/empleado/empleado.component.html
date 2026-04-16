@@ -1,0 +1,183 @@
+<div class="panel-card">
+  <div class="panel-header">
+    <div class="panel-header-title">
+      <h1 class="panel-title">Empleados</h1>
+    </div>
+    <div class="panel-header-actions">
+      <button type="button" class="btn-add" (click)="abrirDialogoEmpleado()">
+        <i class="pi pi-plus"></i>
+        Agregar nuevo empleado
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>Buscar empleado</label>
+      <div class="search-input-wrap">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          pInputText
+          appCapitalizeFirst
+          [(ngModel)]="busqueda"
+          (ngModelChange)="filtrar()"
+          placeholder="Buscar por palabra"
+        />
+      </div>
+    </div>
+  </div>
+
+  <p-table
+    [value]="empleadosFiltrados"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    responsiveLayout="scroll"
+    styleClass="panel-table"
+    [tableStyle]="{ 'min-width': '50rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nombre completo</th>
+        <th>Cargo</th>
+        <th>Área</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-empleado>
+      <tr>
+        <td>
+          <span class="avatar-iniciales">{{ iniciales(empleado.nombre) }}</span>
+          {{ empleado.nombre }}
+        </td>
+        <td>{{ empleado.cargo }}</td>
+        <td>{{ empleado.area }}</td>
+        <td>
+          <span class="estado-badge" [ngClass]="estaActivo(empleado) ? 'activo' : 'inactivo'">
+            <span class="dot"></span>
+            {{ estaActivo(empleado) ? 'ACTIVO' : 'INACTIVO' }}
+          </span>
+        </td>
+        <td>
+          <div class="table-actions">
+            <button type="button" title="Ver" (click)="verEmpleado(empleado)">
+              <i class="pi pi-eye"></i>
+            </button>
+            <button
+              type="button"
+              title="Editar"
+              (click)="editarEmpleado(empleado)"
+            >
+              <i class="pi pi-pencil"></i>
+            </button>
+            <label class="switch-estado" [attr.aria-label]="'Cambiar estado de ' + empleado.nombre">
+              <input
+                type="checkbox"
+                [ngModel]="estaActivo(empleado)"
+                (ngModelChange)="cambiarEstadoEmpleado(empleado, $event)"
+              />
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5">No hay empleados registrados.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<app-form-nuevo-empleado
+  [visible]="mostrarDialogo"
+  (visibleChange)="onDialogoEmpleadoVisible($event)"
+  [empleadoEditar]="empleadoEnEdicion"
+  (submitForm)="onEmpleadoGuardado($event)"
+/>
+
+<p-dialog
+  header="Detalle de empleado"
+  [(visible)]="mostrarDetalleEmpleado"
+  [modal]="true"
+  [style]="{ width: '560px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="detalle-empleado-dialog"
+  (onHide)="cerrarDetalleEmpleado()"
+>
+  @if (empleadoDetalle) {
+    <div class="detalle-empleado">
+      <div class="detalle-seccion detalle-seccion--full">
+        <h3>Información general</h3>
+        <p><strong>Nombre:</strong> {{ empleadoDetalle.nombre }}</p>
+        <p><strong>Cargo:</strong> {{ empleadoDetalle.cargo || '—' }}</p>
+        <p><strong>Área:</strong> {{ empleadoDetalle.area || '—' }}</p>
+        <div class="estado-detalle-bloque">
+          <strong>Estado:</strong>
+          <span class="estado-detalle-wrap">
+            <button
+              pButton
+              type="button"
+              class="btn-estado btn-estado-selected"
+              [label]="estaActivo(empleadoDetalle) ? 'ACTIVO' : 'INACTIVO'"
+              [attr.data-estado]="estaActivo(empleadoDetalle) ? 'ACTIVO' : 'INACTIVO'"
+              [disabled]="true"
+            ></button>
+          </span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cerrar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cerrarDetalleEmpleado()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="mostrarCredencialesFuncionario"
+  [modal]="true"
+  appendTo="body"
+  maskStyleClass="credenciales-funcionario-mask"
+  [closable]="false"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '560px' }"
+  styleClass="credenciales-funcionario-dialog"
+>
+  <div class="credenciales-funcionario-modal">
+    <div class="credenciales-icono">
+      <i class="pi pi-check"></i>
+    </div>
+    <h2 class="credenciales-titulo">
+      {{
+        credencialesFuncionario.creado
+          ? 'Cuenta de funcionario creada correctamente'
+          : 'Cuenta de funcionario ya existente'
+      }}
+    </h2>
+    <p class="credenciales-subtitulo">Comparte estas credenciales para iniciar sesión:</p>
+    <div class="credenciales-datos">
+      <div><strong>Usuario:</strong> {{ credencialesFuncionario.username }}</div>
+      <div><strong>Contraseña:</strong> {{ credencialesFuncionario.password }}</div>
+    </div>
+    <button
+      pButton
+      type="button"
+      label="Aceptar"
+      class="p-button-primary credenciales-btn"
+      (click)="cerrarModalCredenciales()"
+    ></button>
+  </div>
+</p-dialog>

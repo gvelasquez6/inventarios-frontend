@@ -1,0 +1,22 @@
+@use '../login/login.component.scss' as *;
+
+.login-success {
+  margin: 0 0 clamp(0.75rem, 2.5vw, 1rem);
+  padding: 10px 12px;
+  font-size: clamp(0.8125rem, 2.5vw, 0.875rem);
+  color: #166534;
+  background: #f0fdf4;
+  border-radius: 8px;
+  line-height: 1.45;
+}
+
+.login-back {
+  margin: 0.65rem 0 0;
+  text-align: center;
+  font-size: clamp(0.8125rem, 2.5vw, 0.875rem);
+  line-height: 1.4;
+
+  .login-policy-link {
+    font-weight: 500;
+  }
+}

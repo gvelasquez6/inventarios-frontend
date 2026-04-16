@@ -1,0 +1,66 @@
+<div class="login-page">
+  <aside class="login-hero" aria-hidden="true">
+    <img src="/login-hero.png" alt="" />
+  </aside>
+  <div class="login-panel">
+    <div class="login-card">
+      <div class="login-brand">
+        <img class="login-logo" src="/logo_svi.png" width="120" height="68" alt="Inventarios" />
+        <h1 class="login-title">Gestor de inventarios</h1>
+        <p class="login-subtitle">Inicia sesión para continuar</p>
+      </div>
+
+      @if (error) {
+      <p class="login-error">{{ error }}</p>
+      }
+
+      <div class="login-field">
+        <label for="login-user">Usuario</label>
+        <input id="login-user" pInputText type="text" [(ngModel)]="username" autocomplete="username"
+          placeholder="Ej. admin" />
+      </div>
+      <div class="login-field">
+        <label for="login-pass">Contraseña</label>
+        <div class="login-password-wrap">
+          <input id="login-pass" pInputText [type]="mostrarPassword ? 'text' : 'password'" [(ngModel)]="password"
+            autocomplete="current-password" placeholder="••••••••" class="login-password-input"
+            (keydown.enter)="iniciarSesion()" />
+          <button type="button" class="login-toggle-visibility"
+            [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.title]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            (click)="togglePasswordVisibility()">
+            <i class="pi" [ngClass]="mostrarPassword ? 'pi-eye-slash' : 'pi-eye'"></i>
+          </button>
+        </div>
+      </div>
+
+      <fieldset class="login-policies">
+        <legend class="sr-only">Aceptación de políticas</legend>
+        <label class="login-check">
+          <input type="checkbox" name="politicasUso" [(ngModel)]="aceptoPoliticasUso" />
+          <span>
+            Acepto las
+            <a href="#" class="login-policy-link" (click)="$event.preventDefault()">políticas de uso</a>
+            del sistema
+          </span>
+        </label>
+        <label class="login-check">
+          <input type="checkbox" name="privacidad" [(ngModel)]="aceptoPrivacidad" />
+          <span>
+            Acepto la
+            <a href="#" class="login-policy-link" (click)="$event.preventDefault()">política de privacidad</a>
+            y el tratamiento de datos
+          </span>
+        </label>
+      </fieldset>
+
+      <div class="login-actions">
+        <button pButton type="button" label="Entrar" icon="pi pi-sign-in" class="p-button-info btn-login-primary"
+          [disabled]="!puedeIniciarSesion" (click)="iniciarSesion()"></button>
+        <p class="login-forgot">
+          <a routerLink="/recuperar-contrasena" class="login-policy-link">¿Olvidó su contraseña?</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

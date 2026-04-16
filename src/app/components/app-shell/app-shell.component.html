@@ -1,0 +1,174 @@
+<div class="app-container">
+  @if (mostrarSidebar()) {
+    <aside class="sidebar" [class.sidebar--collapsed]="sidebarColapsado()">
+      <img class="sidebar-logo" src="/logo_svi.png" width="40" height="40" alt="Inventarios" />
+      <nav class="sidebar-nav">
+        @if (esAdministrador) {
+          <a routerLink="/dashboard" routerLinkActive="active" class="nav-item" title="Panel de control">
+            <i class="pi pi-chart-bar"></i>
+            <span class="nav-label">Dashboard</span>
+          </a>
+          <a routerLink="/activos" routerLinkActive="active" class="nav-item" title="Activos">
+            <i class="pi pi-box"></i>
+            <span class="nav-label">Activos</span>
+          </a>
+          <a routerLink="/empleados" routerLinkActive="active" class="nav-item" title="Empleados">
+            <i class="pi pi-users"></i>
+            <span class="nav-label">Empleados</span>
+          </a>
+          <a routerLink="/asignaciones" routerLinkActive="active" class="nav-item" title="Asignaciones">
+            <i class="pi pi-link"></i>
+            <span class="nav-label">Asignaciones</span>
+          </a>
+          <a routerLink="/solicitudes-pendientes" routerLinkActive="active" class="nav-item" title="Solicitudes pendientes">
+            <i class="pi pi-send"></i>
+            <span class="nav-label">Solicitudes</span>
+          </a>
+        }
+        @if (esFuncionario) {
+          <a routerLink="/mis-asignaciones" routerLinkActive="active" class="nav-item" title="Mis asignaciones">
+            <i class="pi pi-link"></i>
+            <span class="nav-label">Mis asignaciones</span>
+          </a>
+          <a routerLink="/solicitar-asignacion" routerLinkActive="active" class="nav-item" title="Solicitar asignación">
+            <i class="pi pi-send"></i>
+            <span class="nav-label">Solicitar activo</span>
+          </a>
+        }
+      </nav>
+      <button
+        type="button"
+        class="sidebar-footer-icon"
+        [attr.aria-label]="sidebarColapsado() ? 'Expandir sidebar' : 'Colapsar sidebar'"
+        [attr.title]="sidebarColapsado() ? 'Expandir sidebar' : 'Colapsar sidebar'"
+        (click)="toggleSidebarColapsado($event)"
+      >
+        <i class="pi pi-objects-column"></i>
+      </button>
+    </aside>
+  }
+
+  <div class="app-main">
+    <header class="top-header">
+      <div class="header-left">
+        <div class="header-brand">
+          <span class="header-title">Gestor de inventarios</span>
+          @if (mostrarRegresoModulo()) {
+            <a
+              routerLink="/inicio"
+              class="header-module-link"
+              title="Ir al inicio de módulos"
+            >
+              <i class="pi pi-home" aria-hidden="true"></i>
+              <span>Regresar a módulo</span>
+            </a>
+          }
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-user-block">
+          <div class="notificaciones-dropdown">
+            <button
+              type="button"
+              class="btn-notifications"
+              [attr.aria-label]="'Notificaciones sin leer: ' + totalNotificaciones"
+              title="Notificaciones"
+              (click)="toggleNotificaciones($event)"
+            >
+              <i class="pi pi-bell" aria-hidden="true"></i>
+              @if (totalNotificaciones > 0) {
+                <span class="notification-badge">{{ totalNotificaciones }}</span>
+              }
+            </button>
+            @if (notificacionesAbiertas) {
+              <div class="notificaciones-panel" (click)="$event.stopPropagation()">
+                <div class="notificaciones-panel-header">
+                  <span class="notificaciones-panel-title">Notificaciones</span>
+                  <button
+                    type="button"
+                    class="btn-marcar-leidas"
+                    (click)="marcarNotificacionesComoLeidas($event)"
+                    [disabled]="notificaciones.length === 0"
+                  >
+                    Marcar como leídas
+                  </button>
+                </div>
+                <div class="notificaciones-panel-body">
+                  @if (notificaciones.length === 0) {
+                    <p class="notificaciones-vacio">No hay notificaciones</p>
+                  } @else {
+                    @for (item of notificaciones; track item.id) {
+                      <div class="notificacion-item" [class.notificacion-item--no-leida]="esNoLeida(item)">
+                        <div class="notificacion-item-meta">
+                          <span class="notificacion-item-date">{{ formatearFechaNotificacion(item.fecha) }}</span>
+                          <span class="notificacion-item-status" [class.notificacion-item-status--no-leida]="esNoLeida(item)">
+                            {{ esNoLeida(item) ? 'No leída' : 'Leída' }}
+                          </span>
+                        </div>
+                        <p class="notificacion-item-title">{{ item.titulo }}</p>
+                        <p class="notificacion-item-detail">{{ item.detalle }}</p>
+                        <div class="notificacion-item-actions">
+                          <button type="button" class="btn-accion-link" (click)="abrirNotificacion(item)">Ver</button>
+                          <button
+                            type="button"
+                            class="btn-marcar-notificacion-leida"
+                            [disabled]="!esNoLeida(item)"
+                            (click)="marcarNotificacionComoLeida(item, $event)"
+                          >
+                            Marcar como leída
+                          </button>
+                          <button
+                            type="button"
+                            class="btn-eliminar-notificacion"
+                            title="Quitar notificación"
+                            [attr.aria-label]="'Eliminar notificación: ' + item.titulo"
+                            (click)="eliminarNotificacion(item, $event)"
+                          >
+                            <i class="pi pi-trash" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          <div class="user-info">
+            <span class="user-name">{{ auth.session()?.nombre ?? 'Usuario' }}</span>
+            <span class="user-role">{{ subtituloUsuario }}</span>
+          </div>
+          <div class="user-avatar">
+            @if (auth.session()?.avatarUrl) {
+              <img [src]="auth.session()?.avatarUrl" alt="" class="user-avatar-img" />
+            } @else {
+              <i class="pi pi-user"></i>
+            }
+          </div>
+          <button
+            type="button"
+            class="btn-user-menu"
+            aria-haspopup="menu"
+            aria-label="Abrir menú de usuario"
+            (click)="toggleUserMenu($event)"
+          >
+            <span class="btn-user-menu-inner">
+              <i class="pi pi-chevron-down" aria-hidden="true"></i>
+            </span>
+          </button>
+        </div>
+        <p-menu
+          #userMenu
+          [model]="userMenuItems"
+          [popup]="true"
+          [appendTo]="'body'"
+          styleClass="header-user-menu-popup"
+        ></p-menu>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

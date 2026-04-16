@@ -1,0 +1,460 @@
+* {
+  box-sizing: border-box;
+}
+
+/* ProgressSpinner: estilos globales (sin tema PrimeNG + encapsulado del host) */
+app-root .nav-loading-overlay .p-progressspinner-spin {
+  display: block;
+  width: 84px;
+  height: 84px;
+}
+
+app-root .nav-loading-overlay .p-progressspinner-circle {
+  stroke: #2563eb !important;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-size: 14px;
+  color: #374151;
+  background: #f0f2f5;
+}
+
+// --- Tabla del panel (mismo estilo en todas las pantallas) ---
+// Nota: `styleClass="panel-table"` va en el host `p-table` junto con `p-datatable`;
+// no hay un `.p-datatable` anidado, por eso los selectores usan `.panel-table .p-datatable-tbody` (sin `.p-datatable` intermedio).
+// PrimeNG/PrimeUIX aplica en tema: `.p-datatable-tbody > tr > td { border-width: 0 0 1px 0 }` — hace falta `!important` para quitar líneas entre filas.
+.panel-table {
+  .p-datatable-thead > tr > th {
+    background: #f9fafb;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    padding: 10px 14px;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 8px 14px;
+    font-size: 0.875rem;
+    vertical-align: middle;
+    border: 0 none !important;
+    border-bottom: none !important;
+    border-block-end: 0 none !important;
+    box-shadow: none !important;
+  }
+
+  .p-datatable-tbody > tr:hover {
+    background: #f9fafb;
+  }
+
+  // Quitar borde que el tema pinta entre última fila y paginador
+  .p-datatable-paginator-bottom.p-paginator,
+  .p-datatable-paginator-bottom {
+    border: none !important;
+    border-top: none !important;
+    border-width: 0 !important;
+  }
+
+  .p-paginator {
+    background: #fff;
+    border: none !important;
+    border-top: none !important;
+    padding: 8px 14px;
+  }
+}
+
+// --- Badges de estado (mismo look en todas las pantallas) ---
+.estado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  &.disponible .dot { background: #22c55e; }
+  &.asignado .dot { background: #3b82f6; }
+  &.mantenimiento .dot { background: #f59e0b; }
+  &.baja .dot { background: #ef4444; }
+  &.activo .dot { background: #22c55e; }
+  &.inactivo .dot { background: #ef4444; }
+}
+
+// --- Avatar con iniciales (mismo en empleados y asignaciones) ---
+.avatar-iniciales {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.w-full {
+  width: 100%;
+}
+
+// --- Acciones de tabla ---
+.table-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  button {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+
+    &:hover {
+      color: #2563eb;
+      background: #eff6ff;
+    }
+
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+// --- Menú usuario (chevron): el overlay va a body; estilos globales ---
+.p-menu.header-user-menu-popup {
+  min-width: 220px;
+  padding: 8px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  background: #fff;
+}
+
+.p-menu.header-user-menu-popup .p-menu-list {
+  padding: 4px 0;
+}
+
+.p-menu.header-user-menu-popup .p-menu-item-content {
+  border-radius: 0;
+}
+
+.p-menu.header-user-menu-popup .p-menu-item-link {
+  padding: 10px 14px;
+  gap: 10px;
+  margin: 0 8px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  transition:
+    background 0.15s,
+    color 0.15s;
+
+  &:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+}
+
+.p-menu.header-user-menu-popup .p-menu-item-icon {
+  font-size: 0.9375rem;
+  color: #2563eb;
+}
+
+.p-menu.header-user-menu-popup .p-menu-item-label {
+  line-height: 1.3;
+}
+
+.p-menu.header-user-menu-popup .p-menu-separator {
+  margin: 6px 12px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.p-menu.header-user-menu-popup .p-menu-item:last-child .p-menu-item-link {
+  color: #64748b;
+
+  &:hover {
+    background: #fef2f2;
+    color: #dc2626;
+  }
+}
+
+.p-menu.header-user-menu-popup .p-menu-item:last-child .p-menu-item-icon {
+  color: #64748b;
+}
+
+.p-menu.header-user-menu-popup .p-menu-item:last-child .p-menu-item-link:hover .p-menu-item-icon {
+  color: #dc2626;
+}
+
+// Autocomplete en diálogos (overlay va a body): panel e ítems alineados con el resto de la app
+.p-autocomplete-overlay.asignacion-ac-panel {
+  z-index: 13000 !important;
+  min-width: min(100vw - 2rem, 320px);
+  padding: 6px;
+  margin-top: 4px;
+  background: #fff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 10px !important;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.12),
+    0 4px 10px rgba(15, 23, 42, 0.06) !important;
+  overflow: hidden;
+
+  .p-autocomplete-list {
+    padding: 4px 0;
+    gap: 0;
+  }
+
+  .p-autocomplete-list-container {
+    max-height: 240px;
+  }
+
+  .p-autocomplete-option {
+    margin: 0 4px;
+    padding: 0 !important;
+    border-radius: 8px;
+    overflow: hidden;
+
+    &:not(.p-autocomplete-option-group) {
+      padding: 0 !important;
+    }
+  }
+
+  .p-autocomplete-option:not(.p-disabled):hover,
+  .p-autocomplete-option.p-focus {
+    background: #eff6ff !important;
+  }
+
+  .ac-suggestion {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 10px 12px;
+    width: 100%;
+    text-align: left;
+  }
+
+  .ac-suggestion__title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.35;
+  }
+
+  .ac-suggestion__meta {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+    line-height: 1.3;
+  }
+}
+
+// p-select "Solicitar asignación" (overlay en body): mismo lenguaje visual que dropdowns tipo Lara
+.p-select-overlay.solicitud-activo-panel {
+  z-index: 13000 !important;
+  margin-top: 4px;
+  padding: 6px;
+  background: #fff !important;
+  border: 1px solid #bfdbfe !important;
+  border-radius: 8px !important;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.12),
+    0 4px 10px rgba(15, 23, 42, 0.06) !important;
+  overflow: hidden;
+
+  .p-select-list-container {
+    max-height: 280px;
+  }
+
+  .p-select-list {
+    padding: 4px 0;
+    gap: 0;
+  }
+
+  .p-select-option {
+    margin: 2px 6px;
+    padding: 10px 12px !important;
+    border-radius: 6px;
+    transition: background-color 0.15s ease;
+
+    .p-select-option-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #344054;
+      line-height: 1.4;
+    }
+  }
+
+  .p-select-option:not(.p-disabled):hover,
+  .p-select-option.p-focus {
+    background: #eff6ff !important;
+  }
+
+  .p-select-option.p-select-option-selected {
+    background: #eff6ff !important;
+
+    .p-select-option-label {
+      font-weight: 600;
+      color: #111827;
+    }
+  }
+
+  .p-select-empty-message {
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+}
+
+// Toasts: centro inferior + mensaje de éxito en verde
+.p-toast.toast-app.p-toast-bottom-center {
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%);
+  bottom: max(1.25rem, env(safe-area-inset-bottom, 0px)) !important;
+  width: min(100% - 2rem, 32rem);
+  margin: 0;
+}
+
+.p-toast.toast-app .p-toast-message.toast-msg-exito.p-toast-message-success,
+.p-toast.toast-app .p-toast-message.toast-msg-exito {
+  background: #16a34a;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.14),
+    0 8px 24px rgba(22, 163, 74, 0.38);
+  color: #fff;
+  padding: 1.25rem 3rem 1.25rem 1.375rem;
+}
+
+.p-toast.toast-app .toast-msg-exito .p-toast-message-content {
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.25rem 0;
+  width: 100%;
+}
+
+/* El icono de éxito es el propio <svg class="p-toast-message-icon">, no un wrapper */
+.p-toast.toast-app .toast-msg-exito .p-toast-message-icon {
+  color: #fff;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  display: block;
+}
+
+.p-toast.toast-app .toast-msg-exito .p-toast-message-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  line-height: 1.5;
+}
+
+.p-toast.toast-app .toast-msg-exito .p-toast-summary {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #fff;
+}
+
+.p-toast.toast-app .toast-msg-exito .p-toast-detail {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1rem;
+  margin-top: 0;
+}
+
+.p-toast.toast-app .toast-msg-exito .p-toast-close-button {
+  color: #fff;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+}
+
+// Toasts de error (misma posición; fondo rojo, texto blanco)
+.p-toast.toast-app .p-toast-message.toast-msg-error.p-toast-message-error,
+.p-toast.toast-app .p-toast-message.toast-msg-error {
+  background: #dc2626;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 8px 24px rgba(220, 38, 38, 0.35);
+  color: #fff;
+  padding: 1.25rem 3rem 1.25rem 1.375rem;
+}
+
+.p-toast.toast-app .toast-msg-error .p-toast-message-content {
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.25rem 0;
+  width: 100%;
+}
+
+.p-toast.toast-app .toast-msg-error .p-toast-message-icon {
+  color: #fff;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  display: block;
+}
+
+.p-toast.toast-app .toast-msg-error .p-toast-message-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  line-height: 1.5;
+}
+
+.p-toast.toast-app .toast-msg-error .p-toast-summary {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #fff;
+}
+
+.p-toast.toast-app .toast-msg-error .p-toast-detail {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1rem;
+  margin-top: 0;
+}
+
+.p-toast.toast-app .toast-msg-error .p-toast-close-button {
+  color: #fff;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+}
+
+/* Overlay global para modal de credenciales de funcionario */
+body .p-dialog-mask.credenciales-funcionario-mask,
+body .p-component-overlay.credenciales-funcionario-mask {
+  background: rgba(17, 24, 39, 0.72) !important;
+  backdrop-filter: blur(1.5px);
+}

@@ -1,0 +1,13 @@
+<p-toast position="bottom-center" styleClass="toast-app" />
+@if (navLoading()) {
+  <div
+    class="nav-loading-overlay"
+    role="status"
+    aria-live="polite"
+    aria-busy="true"
+    aria-label="Cargando"
+  >
+    <p-progressSpinner strokeWidth="4" styleClass="nav-loading-spinner" ariaLabel="Cargando" />
+  </div>
+}
+<router-outlet />

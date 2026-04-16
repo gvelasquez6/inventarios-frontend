@@ -1,0 +1,137 @@
+<div class="dashboard-page">
+  <header class="dashboard-header">
+    <div class="dashboard-header-text">
+      <h1 class="dashboard-title">
+        Hola {{ primerNombre }}, bienvenido.
+      </h1>
+      <p class="dashboard-subtitle">
+        Resumen general del inventario y la actividad registrada en el sistema.
+      </p>
+    </div>
+  </header>
+
+  @if (cargando) {
+    <p class="dashboard-loading">Cargando indicadores…</p>
+  } @else if (errorCarga) {
+    <p class="dashboard-loading" role="alert">{{ errorCarga }}</p>
+  } @else {
+    <section class="dashboard-section dashboard-section--kpi" aria-labelledby="kpi-heading">
+      <h2 id="kpi-heading" class="section-title section-title--kpi-page">Indicadores principales</h2>
+      <div class="kpi-panels-grid">
+        <div class="kpi-panel">
+          <div class="kpi-grid">
+            <article class="kpi-card kpi-card--primary">
+              <div class="kpi-icon" aria-hidden="true"><i class="pi pi-box"></i></div>
+              <div class="kpi-body">
+                <span class="kpi-value">{{ totalActivos }}</span>
+                <span class="kpi-label">Activos en inventario</span>
+              </div>
+            </article>
+            <article class="kpi-card kpi-card--success">
+              <div class="kpi-icon" aria-hidden="true"><i class="pi pi-check-circle"></i></div>
+              <div class="kpi-body">
+                <span class="kpi-value">{{ activosDisponibles }}</span>
+                <span class="kpi-label">Disponibles para asignar</span>
+              </div>
+            </article>
+            <article class="kpi-card kpi-card--info">
+              <div class="kpi-icon" aria-hidden="true"><i class="pi pi-user-plus"></i></div>
+              <div class="kpi-body">
+                <span class="kpi-value">{{ activosAsignados }}</span>
+                <span class="kpi-label">Asignados a personal</span>
+              </div>
+            </article>
+            <article class="kpi-card kpi-card--warning">
+              <div class="kpi-icon" aria-hidden="true"><i class="pi pi-wrench"></i></div>
+              <div class="kpi-body">
+                <span class="kpi-value">{{ activosMantenimiento }}</span>
+                <span class="kpi-label">En mantenimiento</span>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="kpi-panel">
+          <div class="kpi-grid">
+            <article class="kpi-card kpi-card--muted">
+              <div class="kpi-icon" aria-hidden="true"><i class="pi pi-ban"></i></div>
+              <div class="kpi-body">
+                <span class="kpi-value">{{ activosBaja }}</span>
+                <span class="kpi-label">Dados de baja</span>
+              </div>
+            </article>
+            <article class="kpi-card kpi-card--people">
+              <div class="kpi-icon" aria-hidden="true"><i class="pi pi-users"></i></div>
+              <div class="kpi-body">
+                <span class="kpi-value">{{ totalEmpleados }}</span>
+                <span class="kpi-label">Empleados registrados</span>
+              </div>
+            </article>
+            <article class="kpi-card kpi-card--link">
+              <div class="kpi-icon" aria-hidden="true"><i class="pi pi-link"></i></div>
+              <div class="kpi-body">
+                <span class="kpi-value">{{ totalAsignaciones }}</span>
+                <span class="kpi-label">Asignaciones registradas</span>
+              </div>
+            </article>
+            <a
+              routerLink="/solicitudes-pendientes"
+              class="kpi-card kpi-card--pending kpi-card--nav"
+              title="Ir a solicitudes pendientes"
+            >
+              <div class="kpi-icon" aria-hidden="true"><i class="pi pi-send"></i></div>
+              <div class="kpi-body">
+                <span class="kpi-value">{{ solicitudesPendientes }}</span>
+                <span class="kpi-label">Solicitudes pendientes</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="dashboard-charts-row">
+      <section class="dashboard-section dashboard-section--uso-chart" aria-labelledby="uso-heading">
+        <div class="uso-chart-panel">
+          <h2 id="uso-heading" class="section-title section-title--uso-panel">Uso del inventario</h2>
+          @if (usoInventarioChartData) {
+            <div class="uso-chart-wrap">
+              <p-chart
+                type="pie"
+                [data]="usoInventarioChartData"
+                [options]="usoInventarioChartOptions"
+                [style]="{ width: '100%', height: '210px' }"
+              ></p-chart>
+            </div>
+            <p class="uso-chart-footnote">
+              Activos asignados: <strong>{{ tasaAsignacion }}%</strong> del total en inventario.
+            </p>
+          } @else {
+            <p class="uso-chart-empty">No hay activos registrados para mostrar el gráfico.</p>
+          }
+        </div>
+      </section>
+
+      <section class="dashboard-section dashboard-section--gestion-admin" aria-labelledby="gestion-heading">
+        <div class="gestion-admin-panel">
+          <h2 id="gestion-heading" class="section-title section-title--gestion-panel">Distribución de solicitudes</h2>
+          @if (gestionAdminChartData) {
+            <div class="gestion-admin-chart-wrap">
+              <p-chart
+                type="bar"
+                [data]="gestionAdminChartData"
+                [options]="gestionAdminChartOptions"
+                [style]="{ width: '100%', height: '220px' }"
+              ></p-chart>
+            </div>
+            <p class="gestion-admin-footnote">
+              Distribución actual por estado administrativo de las solicitudes.
+            </p>
+          } @else {
+            <p class="uso-chart-empty">Sin información suficiente para mostrar prioridades de gestión.</p>
+          }
+        </div>
+      </section>
+    </div>
+  }
+</div>

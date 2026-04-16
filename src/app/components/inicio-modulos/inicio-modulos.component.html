@@ -1,0 +1,59 @@
+<div class="inicio-modulos">
+  <div class="inicio-modulos-intro">
+    <h1 class="inicio-titulo">Bienvenido</h1>
+    <p class="inicio-subtitulo">Seleccione el módulo de su interés</p>
+  </div>
+
+  <div class="inicio-modulos-grid" [class.inicio-modulos-grid--funcionario]="esFuncionario">
+    @if (esAdministrador) {
+      <a routerLink="/dashboard" class="modulo-card-link" title="Ir al panel de control del inventario">
+        <article class="modulo-card">
+          <div class="modulo-card-icon" aria-hidden="true">
+            <i class="pi pi-box"></i>
+          </div>
+          <h2 class="modulo-card-titulo">Gestor de inventarios</h2>
+          <p class="modulo-card-desc">
+            Herramienta sencilla para llevar el control de equipos, bienes y asignaciones de tu organización en un solo
+            lugar.
+          </p>
+          <span class="modulo-card-cta">
+            Entrar al sistema
+            <i class="pi pi-arrow-right"></i>
+          </span>
+        </article>
+      </a>
+    }
+    @if (esFuncionario) {
+      <a routerLink="/mis-asignaciones" class="modulo-card-link" title="Ir a mis asignaciones">
+        <article class="modulo-card">
+          <div class="modulo-card-icon" aria-hidden="true">
+            <i class="pi pi-link"></i>
+          </div>
+          <h2 class="modulo-card-titulo">Mis asignaciones</h2>
+          <p class="modulo-card-desc">
+            Consulta los activos que tienes asignados actualmente y revisa su estado de manera rápida.
+          </p>
+          <span class="modulo-card-cta">
+            Ver mis asignaciones
+            <i class="pi pi-arrow-right"></i>
+          </span>
+        </article>
+      </a>
+      <a routerLink="/solicitar-asignacion" class="modulo-card-link" title="Solicitar asignación de activo">
+        <article class="modulo-card">
+          <div class="modulo-card-icon" aria-hidden="true">
+            <i class="pi pi-send"></i>
+          </div>
+          <h2 class="modulo-card-titulo">Solicitar asignación</h2>
+          <p class="modulo-card-desc">
+            Envía solicitudes de activos disponibles para que el administrador las revise.
+          </p>
+          <span class="modulo-card-cta">
+            Crear solicitud
+            <i class="pi pi-arrow-right"></i>
+          </span>
+        </article>
+      </a>
+    }
+  </div>
+</div>

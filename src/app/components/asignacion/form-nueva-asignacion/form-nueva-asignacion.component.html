@@ -1,0 +1,176 @@
+<p-dialog
+  [header]="tituloDialogo"
+  [(visible)]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [style]="{ width: '560px' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="cerrar()"
+>
+  <form
+    id="formNuevaAsignacion"
+    #formAsignacion="ngForm"
+    class="dialog-form"
+    (ngSubmit)="enviar()"
+    novalidate
+    autocomplete="off"
+  >
+    @if (errorAsignacion) {
+      <p class="error-msg">{{ errorAsignacion }}</p>
+    }
+    <div class="form-field">
+      <label for="fas-empleado">Empleado</label>
+      <p-autoComplete
+        inputId="fas-empleado"
+        name="empleado"
+        [(ngModel)]="form.empleado"
+        [suggestions]="empleadosFiltrados"
+        (completeMethod)="filtrarEmpleados($event)"
+        optionLabel="nombre"
+        placeholder="Seleccione un empleado"
+        [inputStyleClass]="'w-full'"
+        appendTo="body"
+        panelStyleClass="asignacion-ac-panel"
+        required
+        #empleadoCtrl="ngModel"
+      >
+        <ng-template let-empleado pTemplate="item">
+          <div class="ac-suggestion">
+            <span class="ac-suggestion__title">{{ empleado.nombre }}</span>
+            @if (empleado.cargo || empleado.area) {
+              <span class="ac-suggestion__meta">
+                {{ empleado.cargo }}{{ empleado.cargo && empleado.area ? ' · ' : '' }}{{ empleado.area }}
+              </span>
+            }
+          </div>
+        </ng-template>
+      </p-autoComplete>
+      @if (empleadoCtrl.invalid && empleadoCtrl.touched) {
+        <small class="field-error" role="alert">Selecciona un empleado.</small>
+      }
+    </div>
+    <div class="form-field">
+      <label for="fas-activo">Activo</label>
+      <p-autoComplete
+        inputId="fas-activo"
+        name="activo"
+        [(ngModel)]="form.activo"
+        [suggestions]="activosFiltrados"
+        (completeMethod)="filtrarActivos($event)"
+        (onSelect)="onActivoSeleccionado($event.value)"
+        optionLabel="tipo"
+        placeholder="Seleccione un activo disponible"
+        [inputStyleClass]="'w-full'"
+        appendTo="body"
+        panelStyleClass="asignacion-ac-panel"
+        required
+        #activoCtrl="ngModel"
+      >
+        <ng-template let-activo pTemplate="item">
+          <div class="ac-suggestion">
+            <span class="ac-suggestion__title">{{ activo.tipo }}</span>
+            <span class="ac-suggestion__meta">{{ activo.marca }} · {{ activo.modelo }}</span>
+          </div>
+        </ng-template>
+      </p-autoComplete>
+      @if (activoCtrl.invalid && activoCtrl.touched) {
+        <small class="field-error" role="alert">Selecciona un activo disponible.</small>
+      }
+    </div>
+    @if (asignacionEditar) {
+      <div class="form-field form-field-full">
+        <label>Estado actual del activo</label>
+        <div class="estado-buttons-wrap estado-actual-wrap">
+          <button
+            pButton
+            type="button"
+            [label]="form.estadoActivo || 'SIN ESTADO'"
+            class="btn-estado btn-estado-selected estado-actual-btn"
+            [attr.data-estado]="form.estadoActivo || 'SIN_ESTADO'"
+            [disabled]="true"
+          ></button>
+        </div>
+      </div>
+      @if (form.estadoActivo === 'MANTENIMIENTO' || form.estadoActivo === 'BAJA') {
+      <div class="form-field form-field-full">
+        <label for="fas-motivo-mantenimiento">Motivo de mantenimiento</label>
+        <textarea
+          id="fas-motivo-mantenimiento"
+          pInputText
+          name="motivoMantenimiento"
+          [(ngModel)]="form.motivoMantenimiento"
+          rows="3"
+          maxlength="300"
+          [required]="form.estadoActivo === 'MANTENIMIENTO'"
+          placeholder="Describe el motivo del estado actual del activo"
+          #motivoMantenimientoCtrl="ngModel"
+        ></textarea>
+        @if (motivoMantenimientoCtrl.invalid && motivoMantenimientoCtrl.touched) {
+          <small class="field-error" role="alert">Indica el motivo del mantenimiento.</small>
+        }
+      </div>
+      }
+      @if (form.estadoActivo === 'DISPONIBLE' || form.estadoActivo === 'ASIGNADO') {
+      <div class="form-field form-field-full">
+        <label for="fas-observaciones">Observaciones</label>
+        <textarea
+          id="fas-observaciones"
+          pInputText
+          name="observaciones"
+          [(ngModel)]="form.observaciones"
+          rows="3"
+          maxlength="300"
+          placeholder="Agrega observaciones para el estado actual del activo"
+        ></textarea>
+      </div>
+      }
+    }
+    <div class="form-field form-field-full">
+      <label for="fas-fecha">Fecha de asignación</label>
+      <input
+        id="fas-fecha"
+        pInputText
+        type="date"
+        name="fechaAsignacion"
+        [(ngModel)]="form.fechaAsignacion"
+        [min]="fechaMinima"
+        (ngModelChange)="onFechaAsignacionElegida($event)"
+        class="w-full"
+        required
+        #fechaCtrl="ngModel"
+      />
+      @if (fechaHoraAsignacion) {
+        <p class="fecha-hora-asignacion">
+          Hora:
+          <strong>{{ fechaHoraAsignacion | date: 'h:mm a' }}</strong>
+        </p>
+      }
+      @if (fechaCtrl.invalid && fechaCtrl.touched) {
+        <small class="field-error" role="alert">Indica la fecha de asignación.</small>
+      }
+      @if (errorFechaPasada) {
+        <small class="field-error" role="alert">No puedes seleccionar una fecha anterior a hoy.</small>
+      }
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cerrar()"
+    ></button>
+    <button
+      pButton
+      type="submit"
+      form="formNuevaAsignacion"
+      [label]="etiquetaBotonEnviar"
+      icon="pi pi-check"
+      class="p-button-info btn-dialog btn-dialog-primary"
+      [disabled]="!formAsignacion?.valid"
+    ></button>
+  </ng-template>
+</p-dialog>

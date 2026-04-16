@@ -1,0 +1,180 @@
+<p-dialog
+  [header]="tituloDialogo"
+  [(visible)]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [style]="{ width: '560px' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="cerrar()"
+>
+  <form
+    id="formNuevoActivo"
+    #formActivo="ngForm"
+    class="dialog-form"
+    (ngSubmit)="enviar()"
+    novalidate
+    autocomplete="off"
+  >
+    <div class="form-field">
+      <label for="fa-tipo">Tipo</label>
+      <input
+        id="fa-tipo"
+        pInputText
+        appCapitalizeFirst
+        type="text"
+        name="tipo"
+        [(ngModel)]="form.tipo"
+        required
+        minlength="2"
+        maxlength="200"
+        [attr.pattern]="'.*\\S.*'"
+        #tipoCtrl="ngModel"
+        placeholder="Ej. Laptop"
+      />
+      @if (tipoCtrl.invalid && tipoCtrl.touched) {
+        <small class="field-error" role="alert">
+          @if (tipoCtrl.errors?.['required']) {
+            El tipo es obligatorio.
+          } @else if (tipoCtrl.errors?.['minlength']) {
+            Mínimo 2 caracteres.
+          } @else if (tipoCtrl.errors?.['pattern']) {
+            No uses solo espacios.
+          }
+        </small>
+      }
+    </div>
+    <div class="form-field">
+      <label for="fa-marca">Marca</label>
+      <input
+        id="fa-marca"
+        pInputText
+        appCapitalizeFirst
+        type="text"
+        name="marca"
+        [(ngModel)]="form.marca"
+        required
+        minlength="2"
+        maxlength="200"
+        [attr.pattern]="'.*\\S.*'"
+        #marcaCtrl="ngModel"
+        placeholder="Ej. Dell"
+      />
+      @if (marcaCtrl.invalid && marcaCtrl.touched) {
+        <small class="field-error" role="alert">
+          @if (marcaCtrl.errors?.['required']) {
+            La marca es obligatoria.
+          } @else if (marcaCtrl.errors?.['minlength']) {
+            Mínimo 2 caracteres.
+          } @else if (marcaCtrl.errors?.['pattern']) {
+            No uses solo espacios.
+          }
+        </small>
+      }
+    </div>
+    <div class="form-field">
+      <label for="fa-modelo">Modelo</label>
+      <input
+        id="fa-modelo"
+        pInputText
+        appCapitalizeFirst
+        type="text"
+        name="modelo"
+        [(ngModel)]="form.modelo"
+        required
+        minlength="2"
+        maxlength="200"
+        [attr.pattern]="'.*\\S.*'"
+        #modeloCtrl="ngModel"
+        placeholder="Ej. XPS 13"
+      />
+      @if (modeloCtrl.invalid && modeloCtrl.touched) {
+        <small class="field-error" role="alert">
+          @if (modeloCtrl.errors?.['required']) {
+            El modelo es obligatorio.
+          } @else if (modeloCtrl.errors?.['minlength']) {
+            Mínimo 2 caracteres.
+          } @else if (modeloCtrl.errors?.['pattern']) {
+            No uses solo espacios.
+          }
+        </small>
+      }
+    </div>
+    <div class="form-field">
+      <label for="fa-serial">Serial</label>
+      <input
+        id="fa-serial"
+        pInputText
+        appCapitalizeFirst
+        type="text"
+        name="serial"
+        [(ngModel)]="form.serial"
+        required
+        minlength="2"
+        maxlength="200"
+        [attr.pattern]="'.*\\S.*'"
+        #serialCtrl="ngModel"
+        placeholder="Ej. 123ABC"
+      />
+      @if (serialCtrl.invalid && serialCtrl.touched) {
+        <small class="field-error" role="alert">
+          @if (serialCtrl.errors?.['required']) {
+            El serial es obligatorio.
+          } @else if (serialCtrl.errors?.['minlength']) {
+            Mínimo 2 caracteres.
+          } @else if (serialCtrl.errors?.['pattern']) {
+            No uses solo espacios.
+          }
+        </small>
+      }
+    </div>
+    <div class="form-field form-field-full estado-buttons">
+      <label for="fa-estado">Estado</label>
+      <input
+        id="fa-estado"
+        type="hidden"
+        name="estado"
+        [(ngModel)]="form.estado"
+        required
+        #estadoCtrl="ngModel"
+      />
+      <div
+        class="estado-buttons-wrap"
+        [class.estado-invalid]="estadoCtrl.invalid && estadoCtrl.touched"
+      >
+        <button
+          *ngFor="let opt of estados"
+          pButton
+          type="button"
+          [label]="opt.label"
+          [class.btn-estado]="true"
+          [class.btn-estado-selected]="form.estado === opt.value"
+          [attr.data-estado]="opt.value"
+          (click)="form.estado = opt.value"
+        ></button>
+      </div>
+      @if (estadoCtrl.invalid && estadoCtrl.touched) {
+        <small class="field-error" role="alert">Selecciona un estado.</small>
+      }
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cerrar()"
+    ></button>
+    <button
+      pButton
+      type="submit"
+      form="formNuevoActivo"
+      [label]="etiquetaBotonEnviar"
+      icon="pi pi-check"
+      class="p-button-info btn-dialog btn-dialog-primary"
+      [disabled]="formActivoRef.invalid"
+    ></button>
+  </ng-template>
+</p-dialog>
