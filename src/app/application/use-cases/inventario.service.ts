@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Activo, Empleado, Asignacion } from '../../domain';
+import { Activo, Empleado, Asignacion, EmpleadoAltaResultado } from '../../domain';
 import { ActivoRepositoryPort } from '../ports/activo.repository.port';
 import { EmpleadoRepositoryPort } from '../ports/empleado.repository.port';
 import { AsignacionRepositoryPort } from '../ports/asignacion.repository.port';
@@ -33,7 +33,9 @@ export class InventarioService {
     return this.empleados.getEmpleados();
   }
 
-  addEmpleado(empleado: Partial<Empleado>): Observable<Empleado> {
+  addEmpleado(
+    empleado: Partial<Empleado> & { username?: string; password?: string },
+  ): Observable<EmpleadoAltaResultado> {
     return this.empleados.addEmpleado(empleado);
   }
 

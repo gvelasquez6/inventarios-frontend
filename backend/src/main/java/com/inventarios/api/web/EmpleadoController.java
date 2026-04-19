@@ -2,6 +2,8 @@ package com.inventarios.api.web;
 
 import com.inventarios.api.domain.Empleado;
 import com.inventarios.api.repository.EmpleadoRepository;
+import com.inventarios.api.service.EmpleadoService;
+import com.inventarios.api.web.dto.EmpleadoCreadoResponse;
 import com.inventarios.api.web.dto.NuevoEmpleadoRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -21,9 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmpleadoController {
 
   private final EmpleadoRepository empleadoRepository;
+  private final EmpleadoService empleadoService;
 
-  public EmpleadoController(EmpleadoRepository empleadoRepository) {
+  public EmpleadoController(EmpleadoRepository empleadoRepository, EmpleadoService empleadoService) {
     this.empleadoRepository = empleadoRepository;
+    this.empleadoService = empleadoService;
   }
 
   @GetMapping
@@ -33,28 +37,12 @@ public class EmpleadoController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public Empleado crear(@Valid @RequestBody NuevoEmpleadoRequest body) {
-    Empleado e = new Empleado();
-    e.setNombre(body.getNombre().trim());
-    e.setCargo(body.getCargo().trim());
-    e.setArea(body.getArea().trim());
-    e.setActivo(body.getActivo() != null ? body.getActivo() : Boolean.TRUE);
-    return empleadoRepository.save(e);
+  public EmpleadoCreadoResponse crear(@Valid @RequestBody NuevoEmpleadoRequest body) {
+    return empleadoService.crearConCuenta(body);
   }
 
   @PutMapping("/{id}")
-  public Empleado actualizar(
-      @PathVariable Long id, @Valid @RequestBody NuevoEmpleadoRequest body) {
-    Empleado e =
-        empleadoRepository
-            .findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado"));
-    e.setNombre(body.getNombre().trim());
-    e.setCargo(body.getCargo().trim());
-    e.setArea(body.getArea().trim());
-    if (body.getActivo() != null) {
-      e.setActivo(body.getActivo());
-    }
-    return empleadoRepository.save(e);
+  public Empleado actualizar(@PathVariable Long id, @Valid @RequestBody NuevoEmpleadoRequest body) {
+    return empleadoService.actualizar(id, body);
   }
 }

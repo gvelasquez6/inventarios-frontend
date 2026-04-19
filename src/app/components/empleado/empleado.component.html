@@ -164,10 +164,16 @@
       {{
         credencialesFuncionario.creado
           ? 'Cuenta de funcionario creada correctamente'
-          : 'Cuenta de funcionario ya existente'
+          : 'Empleado registrado con credenciales personalizadas'
       }}
     </h2>
-    <p class="credenciales-subtitulo">Comparte estas credenciales para iniciar sesión:</p>
+    <p class="credenciales-subtitulo">
+      @if (credencialesFuncionario.creado) {
+        Comparte estas credenciales para iniciar sesión:
+      } @else {
+        Comparte el usuario y la contraseña que indicaste en el formulario de alta.
+      }
+    </p>
     <div class="credenciales-datos">
       <div><strong>Usuario:</strong> {{ credencialesFuncionario.username }}</div>
       <div><strong>Contraseña:</strong> {{ credencialesFuncionario.password }}</div>

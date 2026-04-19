@@ -1,0 +1,60 @@
+<p-dialog
+  [header]="tituloDialogo"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '560px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="cerrarDialogo()"
+>
+  <div class="dialog-form">
+    <div class="form-field form-field--activo-select">
+      <label for="sol-activo">Activo disponible</label>
+      <p-select
+        inputId="sol-activo"
+        [options]="opcionesActivos"
+        optionLabel="label"
+        optionValue="value"
+        [(ngModel)]="form.idActivo"
+        placeholder="Selecciona un activo disponible"
+        [showClear]="true"
+        appendTo="body"
+        panelStyleClass="solicitud-activo-panel"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="sol-motivo">Motivo (opcional)</label>
+      <textarea
+        id="sol-motivo"
+        pInputText
+        rows="3"
+        maxlength="500"
+        [(ngModel)]="form.motivo"
+        placeholder="Describe por qué necesitas el activo"
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cerrarDialogo()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="etiquetaBotonEnviar"
+      icon="pi pi-check"
+      class="p-button-info btn-dialog btn-dialog-primary"
+      [disabled]="!form.idActivo || enviando"
+      (click)="enviarSolicitud()"
+    ></button>
+  </ng-template>
+</p-dialog>
+

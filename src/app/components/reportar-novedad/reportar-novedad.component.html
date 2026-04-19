@@ -1,0 +1,135 @@
+<div class="panel-card">
+  <div class="panel-header">
+    <div class="panel-header-title">
+      <h1 class="panel-title">Mis reportes de novedad</h1>
+    </div>
+    <div class="panel-header-actions">
+      <button type="button" class="btn-nuevo-reporte" (click)="abrirDialogoReporte()">
+        <i class="pi pi-plus"></i>
+        Nuevo reporte
+      </button>
+    </div>
+  </div>
+
+  <p class="intro-texto">
+    Cuando el administrador confirme que el activo ya está reparado y puedes recogerlo, lo verás en la
+    columna <strong>Seguimiento</strong>.
+  </p>
+
+  <p-table
+    [value]="misNovedades"
+    [loading]="cargandoNovedades"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    responsiveLayout="scroll"
+    styleClass="panel-table"
+    [tableStyle]="{ 'min-width': '52rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Fecha</th>
+        <th>Activo</th>
+        <th>Tipo</th>
+        <th>Estado</th>
+        <th>Seguimiento</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-n>
+      <tr>
+        <td>{{ n.fechaReporte | date: 'short' }}</td>
+        <td>{{ n.activo?.tipo }} — {{ n.activo?.marca }} ({{ n.activo?.serial || '—' }})</td>
+        <td>{{ etiquetaTipo(n.tipo) }}</td>
+        <td>
+          <span class="estado-novedad-chip" [ngClass]="claseEstado(n.estado)">
+            {{ etiquetaEstado(n.estado) }}
+          </span>
+        </td>
+        <td class="col-seguimiento">{{ textoSeguimiento(n) }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5">Aún no has enviado reportes. Usa «Nuevo reporte» para informar una novedad.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  header="Nuevo reporte de novedad"
+  [(visible)]="dialogReporteVisible"
+  [modal]="true"
+  [style]="{ width: '560px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="cerrarDialogoReporte()"
+>
+  <div class="dialog-form">
+    <p class="dialog-intro">
+      Solo activos asignados a ti y que no estén en mantenimiento. El administrador revisará el caso.
+    </p>
+    <div class="form-field">
+      <label for="asig-reporte">Activo asignado</label>
+      <p-select
+        inputId="asig-reporte"
+        [options]="opcionesAsignacion"
+        optionLabel="label"
+        optionValue="idAsignacion"
+        [(ngModel)]="idAsignacionSeleccion"
+        placeholder="Selecciona el activo"
+        [showClear]="true"
+        appendTo="body"
+        styleClass="w-full estado-filter-select"
+        panelStyleClass="estado-filter-panel"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="tipo-novedad">Tipo de novedad</label>
+      <p-select
+        inputId="tipo-novedad"
+        [options]="tipos"
+        optionLabel="label"
+        optionValue="value"
+        [(ngModel)]="tipo"
+        appendTo="body"
+        styleClass="w-full estado-filter-select"
+        panelStyleClass="estado-filter-panel"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="desc-novedad">Descripción</label>
+      <textarea
+        id="desc-novedad"
+        pInputText
+        rows="5"
+        maxlength="4000"
+        [(ngModel)]="descripcion"
+        placeholder="Describe qué ocurrió (mínimo 8 caracteres)"
+      ></textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      [disabled]="enviando"
+      (click)="cerrarDialogoReporte()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Enviar reporte"
+      icon="pi pi-send"
+      class="p-button-info btn-dialog btn-dialog-primary"
+      [loading]="enviando"
+      [disabled]="!idAsignacionSeleccion || enviando || descripcion.trim().length < 8"
+      (click)="enviar()"
+    ></button>
+  </ng-template>
+</p-dialog>

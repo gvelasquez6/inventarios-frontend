@@ -5,7 +5,6 @@ import com.inventarios.api.repository.AsignacionRepository;
 import com.inventarios.api.service.AsignacionService;
 import com.inventarios.api.web.dto.NuevaAsignacionRequest;
 import java.util.List;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +31,7 @@ public class AsignacionController {
 
   @GetMapping
   public List<Asignacion> listar() {
-    return asignacionRepository.findAll(Sort.by(Sort.Direction.ASC, "idAsignacion"));
+    return asignacionRepository.findAllOrdenadasConActivoYEmpleado();
   }
 
   @PostMapping

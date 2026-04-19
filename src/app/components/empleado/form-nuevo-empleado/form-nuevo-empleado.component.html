@@ -102,6 +102,46 @@
         <small class="field-error" role="alert">Selecciona un área.</small>
       }
     </div>
+    @if (!empleadoEditar) {
+      @if (errorCredencialesIncompletas) {
+        <small class="field-error credenciales-error-global" role="alert">
+          Indica usuario y contraseña juntos (usuario mín. 3 caracteres, contraseña mín. 4), o
+          deja ambos vacíos para que el sistema los genere.
+        </small>
+      }
+      <p class="dialog-hint-credenciales">
+        Opcional: define usuario y contraseña para el acceso al sistema. Si los dejas vacíos, se
+        generarán automáticamente (y se mostrarán al guardar).
+      </p>
+      <div class="form-field form-field-full">
+        <label for="fe-usuario">Usuario de acceso</label>
+        <input
+          id="fe-usuario"
+          pInputText
+          type="text"
+          name="username"
+          [(ngModel)]="form.username"
+          autocomplete="off"
+          minlength="3"
+          maxlength="120"
+          placeholder="Ej. maria.garcia (opcional)"
+        />
+      </div>
+      <div class="form-field form-field-full">
+        <label for="fe-pass-emp">Contraseña inicial</label>
+        <input
+          id="fe-pass-emp"
+          pInputText
+          type="password"
+          name="passwordEmpleado"
+          [(ngModel)]="form.password"
+          autocomplete="new-password"
+          minlength="4"
+          maxlength="200"
+          placeholder="Mínimo 4 caracteres si indicas usuario"
+        />
+      </div>
+    }
   </form>
   <ng-template pTemplate="footer">
     <button

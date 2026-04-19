@@ -14,6 +14,8 @@ import { roleGuard } from './core/guards/role.guard';
 import { MisAsignacionesComponent } from './components/mis-asignaciones/mis-asignaciones.component';
 import { SolicitarAsignacionComponent } from './components/solicitar-asignacion/solicitar-asignacion.component';
 import { SolicitudesPendientesComponent } from './components/solicitudes-pendientes/solicitudes-pendientes.component';
+import { ReportarNovedadComponent } from './components/reportar-novedad/reportar-novedad.component';
+import { NovedadesActivoAdminComponent } from './components/novedades-activo-admin/novedades-activo-admin.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [loginGuard] },
@@ -30,8 +32,10 @@ export const routes: Routes = [
       { path: 'empleados', component: EmpleadoComponent, canActivate: [roleGuard], data: { roles: ['Administrador'] } },
       { path: 'asignaciones', component: AsignacionComponent, canActivate: [roleGuard], data: { roles: ['Administrador'] } },
       { path: 'solicitudes-pendientes', component: SolicitudesPendientesComponent, canActivate: [roleGuard], data: { roles: ['Administrador'] } },
+      { path: 'novedades-activo', component: NovedadesActivoAdminComponent, canActivate: [roleGuard], data: { roles: ['Administrador'] } },
       { path: 'mis-asignaciones', component: MisAsignacionesComponent, canActivate: [roleGuard], data: { roles: ['Funcionario'] } },
       { path: 'solicitar-asignacion', component: SolicitarAsignacionComponent, canActivate: [roleGuard], data: { roles: ['Funcionario'] } },
+      { path: 'reportar-novedad', component: ReportarNovedadComponent, canActivate: [roleGuard], data: { roles: ['Funcionario'] } },
       { path: 'perfil', component: PerfilComponent },
       { path: '**', redirectTo: 'inicio' },
     ],

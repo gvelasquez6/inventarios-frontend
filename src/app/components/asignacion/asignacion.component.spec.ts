@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
+import { MessageService } from 'primeng/api';
 import { AsignacionComponent } from './asignacion.component';
 import { InventarioService } from '../../application/use-cases/inventario.service';
 import {
@@ -11,7 +12,7 @@ import {
 import { ActivoService } from '../../core/services/activo.service';
 import { EmpleadoService } from '../../core/services/empleado.service';
 import { AsignacionService } from '../../core/services/asignacion.service';
-import { Activo, Asignacion, Empleado, EstadoActivo } from '../../domain';
+import { Activo, Asignacion, Empleado, EmpleadoAltaResultado, EstadoActivo } from '../../domain';
 
 describe('AsignacionComponent', () => {
   let component: AsignacionComponent;
@@ -33,6 +34,11 @@ describe('AsignacionComponent', () => {
     area: 'a',
   };
 
+  const dummyAltaEmpleado: EmpleadoAltaResultado = {
+    empleado: dummyEmpleado,
+    credencialGenerada: true,
+  };
+
   const dummyAsignacion: Asignacion = {
     idAsignacion: 1,
     fechaAsignacion: new Date(),
@@ -46,7 +52,7 @@ describe('AsignacionComponent', () => {
     addActivo: () => of(dummyActivo),
     updateActivo: () => of(dummyActivo),
     getEmpleados: () => of([]),
-    addEmpleado: () => of(dummyEmpleado),
+    addEmpleado: () => of(dummyAltaEmpleado),
     updateEmpleado: () => of(dummyEmpleado),
     getAsignaciones: () => of([]),
     addAsignacion: () => of(dummyAsignacion),
@@ -61,6 +67,7 @@ describe('AsignacionComponent', () => {
         { provide: ACTIVO_REPOSITORY, useValue: mockRepository },
         { provide: EMPLEADO_REPOSITORY, useValue: mockRepository },
         { provide: ASIGNACION_REPOSITORY, useValue: mockRepository },
+        { provide: MessageService, useValue: { add: () => {}, clear: () => {} } },
         ActivoService,
         EmpleadoService,
         AsignacionService,
@@ -69,7 +76,13 @@ describe('AsignacionComponent', () => {
           provide: ActivatedRoute,
           useValue: { snapshot: { queryParamMap: { get: () => null } } },
         },
-        { provide: Router, useValue: { navigate: () => Promise.resolve(true) } },
+        {
+          provide: Router,
+          useValue: {
+            navigate: () => Promise.resolve(true),
+            events: new Subject(),
+          },
+        },
       ],
     }).compileComponents();
 

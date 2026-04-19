@@ -87,14 +87,17 @@ export class PerfilComponent {
       this.passError = 'La confirmación no coincide con la nueva contraseña.';
       return;
     }
-    const result = this.auth.changePassword(this.passActual, this.passNueva);
-    if (!result.ok) {
-      this.passError = result.error ?? 'No se pudo cambiar la contraseña.';
-      return;
-    }
-    this.passOk = 'Contraseña actualizada correctamente.';
-    this.passActual = '';
-    this.passNueva = '';
-    this.passConfirmar = '';
+    this.auth.changePassword(this.passActual, this.passNueva).subscribe({
+      next: (result) => {
+        if (!result.ok) {
+          this.passError = result.error ?? 'No se pudo cambiar la contraseña.';
+          return;
+        }
+        this.passOk = 'Contraseña actualizada correctamente.';
+        this.passActual = '';
+        this.passNueva = '';
+        this.passConfirmar = '';
+      },
+    });
   }
 }

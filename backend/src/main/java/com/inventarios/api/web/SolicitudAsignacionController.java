@@ -6,7 +6,10 @@ import com.inventarios.api.web.dto.NuevaSolicitudAsignacionRequest;
 import com.inventarios.api.web.dto.ProcesarSolicitudAsignacionRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/solicitudes-asignacion")
@@ -76,5 +80,48 @@ public class SolicitudAsignacionController {
       @PathVariable Long id,
       @Valid @RequestBody(required = false) ProcesarSolicitudAsignacionRequest body) {
     return solicitudService.rechazar(id, body == null ? null : body.getComentarioAdmin());
+  }
+
+  @GetMapping("/{id}/pdf-original")
+  public ResponseEntity<byte[]> descargarPdfOriginal(@PathVariable Long id) {
+    byte[] pdf = solicitudService.descargarPdfOriginal(id);
+    return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_PDF)
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=solicitud-" + id + "-original.pdf")
+        .body(pdf);
+  }
+
+  @PostMapping(value = "/{id}/pdf-firmado", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public SolicitudAsignacion subirPdfFirmado(
+      @PathVariable Long id, @RequestParam("file") MultipartFile file) {
+    return solicitudService.subirPdfFirmado(id, file);
+  }
+
+  @GetMapping("/{id}/pdf-firmado")
+  public ResponseEntity<byte[]> descargarPdfFirmado(@PathVariable Long id) {
+    byte[] pdf = solicitudService.descargarPdfFirmado(id);
+    return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_PDF)
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=solicitud-" + id + "-firmado.pdf")
+        .body(pdf);
+  }
+
+  @PutMapping("/{id}/aprobar-final")
+  public SolicitudAsignacion aprobarFinal(
+      @PathVariable Long id,
+      @Valid @RequestBody(required = false) ProcesarSolicitudAsignacionRequest body) {
+    return solicitudService.aprobarFinal(id, body == null ? null : body.getComentarioAdmin());
+  }
+
+  @PutMapping("/{id}/rechazar-firma")
+  public SolicitudAsignacion rechazarFirma(
+      @PathVariable Long id,
+      @Valid @RequestBody(required = false) ProcesarSolicitudAsignacionRequest body) {
+    String comentario = body == null ? null : body.getComentarioAdmin();
+    return solicitudService.rechazarFirma(id, comentario);
   }
 }

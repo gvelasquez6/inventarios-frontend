@@ -28,6 +28,9 @@ export interface FormNuevoEmpleadoModel {
   nombre: string;
   cargo: string;
   area: string;
+  /** Solo alta: opcionales; si van vacíos el API genera usuario y contraseña. */
+  username?: string;
+  password?: string;
   /** Si viene definido, el padre debe llamar a actualizar en lugar de crear. */
   idEmpleado?: number;
 }
@@ -55,10 +58,15 @@ export class FormNuevoEmpleadoComponent implements OnChanges {
 
   @ViewChild('formEmpleado') formEmpleadoRef!: NgForm;
 
+  /** Usuario y contraseña opcionales deben ir juntos y cumplir longitud mínima. */
+  errorCredencialesIncompletas = false;
+
   form: FormNuevoEmpleadoModel = {
     nombre: '',
     cargo: '',
     area: '',
+    username: '',
+    password: '',
   };
 
   /**
@@ -101,30 +109,56 @@ export class FormNuevoEmpleadoComponent implements OnChanges {
   }
 
   private aplicarEdicion(e: Empleado): void {
+    this.errorCredencialesIncompletas = false;
     this.idEmpleadoEdicion = idEmpleadoDesde(e as Empleado & { id_empleado?: number }) ?? null;
     this.form = {
       nombre: e.nombre ?? '',
       cargo: e.cargo ?? '',
       area: e.area ?? '',
+      username: '',
+      password: '',
     };
     queueMicrotask(() =>
       this.formEmpleadoRef?.resetForm({
         nombre: this.form.nombre,
         cargo: this.form.cargo,
         area: this.form.area,
+        username: '',
+        password: '',
       }),
     );
   }
 
   cerrar(): void {
+    this.errorCredencialesIncompletas = false;
     this.resetForm();
     this.visibleChange.emit(false);
   }
 
   enviar(): void {
+    this.errorCredencialesIncompletas = false;
     if (!this.formEmpleadoRef || this.formEmpleadoRef.invalid) {
       this.formEmpleadoRef?.form.markAllAsTouched();
       return;
+    }
+    if (this.idEmpleadoEdicion == null) {
+      const u = this.form.username?.trim() ?? '';
+      const p = (this.form.password ?? '').trim();
+      if ((u !== '' && p === '') || (u === '' && p !== '')) {
+        this.errorCredencialesIncompletas = true;
+        this.formEmpleadoRef.form.markAllAsTouched();
+        return;
+      }
+      if (u !== '' && u.length < 3) {
+        this.errorCredencialesIncompletas = true;
+        this.formEmpleadoRef.form.markAllAsTouched();
+        return;
+      }
+      if (p !== '' && p.length < 4) {
+        this.errorCredencialesIncompletas = true;
+        this.formEmpleadoRef.form.markAllAsTouched();
+        return;
+      }
     }
     const payload: FormNuevoEmpleadoModel = {
       nombre: this.form.nombre.trim(),
@@ -133,6 +167,15 @@ export class FormNuevoEmpleadoComponent implements OnChanges {
     };
     if (this.idEmpleadoEdicion != null) {
       payload.idEmpleado = this.idEmpleadoEdicion;
+    } else {
+      const u = this.form.username?.trim() ?? '';
+      const p = (this.form.password ?? '').trim();
+      if (u) {
+        payload.username = u;
+      }
+      if (p) {
+        payload.password = p;
+      }
     }
     this.submitForm.emit(payload);
     this.resetForm();
@@ -140,11 +183,14 @@ export class FormNuevoEmpleadoComponent implements OnChanges {
   }
 
   private resetForm(): void {
+    this.errorCredencialesIncompletas = false;
     this.idEmpleadoEdicion = null;
     const vacio: FormNuevoEmpleadoModel = {
       nombre: '',
       cargo: '',
       area: '',
+      username: '',
+      password: '',
     };
     this.form = vacio;
     queueMicrotask(() => this.formEmpleadoRef?.resetForm(vacio));

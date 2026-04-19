@@ -1,0 +1,84 @@
+<p-dialog
+  header="Subir PDF firmado"
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '520px', maxWidth: '95vw' }"
+  (onHide)="cerrar()"
+>
+  <p class="subir-firmado-texto">
+    Sube el PDF firmado para la solicitud <strong>#{{ solicitudParaFirma?.idSolicitud }}</strong>.
+  </p>
+  <div class="upload-pdf-wrap">
+    <input
+      #pdfInput
+      type="file"
+      accept="application/pdf"
+      class="hidden-file-input"
+      hidden
+      (change)="onFileInputChange($event)"
+    />
+    <button
+      type="button"
+      class="upload-dropzone"
+      [class.upload-dropzone--disabled]="selectorDeshabilitado"
+      [disabled]="selectorDeshabilitado"
+      (click)="abrirSelector(pdfInput)"
+      (dragover)="onDragOver($event)"
+      (drop)="onDrop($event)"
+    >
+      <i class="pi pi-upload"></i>
+      <span class="dropzone-text">Haga clic para seleccionar o arrastre el archivo aquí</span>
+      <span class="dropzone-help">Formato permitido: PDF. Máximo 10 MB</span>
+    </button>
+
+    @if (stagedPdfFirmado; as selectedPdf) {
+      <div class="existing-documents">
+        <h6 class="existing-docs-title">Archivo seleccionado:</h6>
+        <div class="documents-list">
+          <div class="document-item">
+            <div class="document-info">
+              <i class="pi pi-file-pdf logo-upload-placeholder-icon"></i>
+              <div class="logo-label-stack">
+                <span class="document-name">{{ selectedPdf.name }}</span>
+                <span class="logo-file-size-below">{{ formatFileSize(selectedPdf.size) }}</span>
+              </div>
+            </div>
+            <div class="document-actions">
+              <p-button
+                class="actions-global-buttons"
+                icon="pi pi-trash"
+                [disabled]="subiendoFirmado"
+                (onClick)="quitarPdf.emit()"
+              ></p-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Subir PDF firmado"
+      icon="pi pi-upload"
+      class="p-button-info btn-dialog btn-dialog-primary"
+      [loading]="subiendoFirmado"
+      [disabled]="!stagedPdfFirmado || subiendoFirmado"
+      (click)="subirPdf.emit()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Cerrar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      [disabled]="subiendoFirmado"
+      (click)="cerrar()"
+    ></button>
+  </ng-template>
+</p-dialog>
+

@@ -17,13 +17,13 @@
       <div class="login-field">
         <label for="login-user">Usuario</label>
         <input id="login-user" pInputText type="text" [(ngModel)]="username" autocomplete="username"
-          placeholder="Ej. admin" />
+          placeholder="Ingrese su usuario" />
       </div>
       <div class="login-field">
         <label for="login-pass">Contraseña</label>
         <div class="login-password-wrap">
           <input id="login-pass" pInputText [type]="mostrarPassword ? 'text' : 'password'" [(ngModel)]="password"
-            autocomplete="current-password" placeholder="••••••••" class="login-password-input"
+            autocomplete="current-password" placeholder="Ingrese su contraseña" class="login-password-input"
             (keydown.enter)="iniciarSesion()" />
           <button type="button" class="login-toggle-visibility"
             [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
@@ -55,8 +55,18 @@
       </fieldset>
 
       <div class="login-actions">
-        <button pButton type="button" label="Entrar" icon="pi pi-sign-in" class="p-button-info btn-login-primary"
-          [disabled]="!puedeIniciarSesion" (click)="iniciarSesion()"></button>
+        <button
+          pButton
+          type="button"
+          label="Entrar"
+          icon="pi pi-sign-in"
+          severity="info"
+          class="btn-login-primary"
+          [fluid]="true"
+          [disabled]="!puedeIniciarSesion || enviando"
+          [loading]="enviando"
+          (click)="iniciarSesion()"
+        ></button>
         <p class="login-forgot">
           <a routerLink="/recuperar-contrasena" class="login-policy-link">¿Olvidó su contraseña?</a>
         </p>

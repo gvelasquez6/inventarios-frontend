@@ -1,0 +1,143 @@
+<div class="panel-card">
+  <div class="panel-header">
+    <div class="panel-header-title">
+      <h1 class="panel-title">Novedades de activos</h1>
+    </div>
+  </div>
+
+  <p class="intro-texto">
+    Reportes de funcionarios sobre activos asignados. Puedes derivar a mantenimiento o cerrar el caso según corresponda.
+  </p>
+
+  <p-table
+    [value]="lista"
+    [loading]="cargando"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    responsiveLayout="scroll"
+    styleClass="panel-table"
+    [tableStyle]="{ 'min-width': '64rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Fecha</th>
+        <th>Funcionario</th>
+        <th>Activo</th>
+        <th>Tipo</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-n>
+      <tr>
+        <td>{{ n.fechaReporte | date:'short' }}</td>
+        <td>{{ n.empleado?.nombre }}</td>
+        <td>{{ n.activo?.tipo }} — {{ n.activo?.marca }} ({{ n.activo?.serial || '—' }})</td>
+        <td>{{ etiquetaTipo(n.tipo) }}</td>
+        <td>
+          <span class="estado-novedad-chip" [ngClass]="claseEstado(n.estado)">
+            {{ etiquetaEstado(n.estado) }}
+          </span>
+        </td>
+        <td>
+          @if (puedeGestionar(n)) {
+            <button
+              pButton
+              type="button"
+              icon="pi pi-cog"
+              class="p-button-text p-button-rounded"
+              title="Gestionar"
+              (click)="abrirGestion(n)"
+            ></button>
+          } @else {
+            <span class="sin-accion">—</span>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6">No hay novedades registradas.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  header="Gestionar novedad"
+  [(visible)]="mostrarGestion"
+  [modal]="true"
+  [style]="{ width: '560px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="cerrarGestion()"
+>
+  @if (seleccionada) {
+    <div class="dialog-form">
+      <p class="dialog-resumen">
+        <strong>{{ seleccionada.empleado.nombre }}</strong> — {{ seleccionada.activo.tipo }}
+        ({{ seleccionada.activo.serial || 'sin serial' }})
+      </p>
+      <p class="dialog-desc">{{ seleccionada.descripcion }}</p>
+      <div class="form-field">
+        <label for="estado-siguiente">Siguiente estado</label>
+        @if ((seleccionada.estado | uppercase) === 'PENDIENTE') {
+          <p-select
+            inputId="estado-siguiente"
+            [options]="opcionesEstadoPendiente"
+            optionLabel="label"
+            optionValue="value"
+            [(ngModel)]="nuevoEstado"
+            appendTo="body"
+            styleClass="w-full estado-filter-select"
+            panelStyleClass="estado-filter-panel"
+          />
+        } @else {
+          <p-select
+            inputId="estado-siguiente"
+            [options]="opcionesEstadoEnviado"
+            optionLabel="label"
+            optionValue="value"
+            [(ngModel)]="nuevoEstado"
+            appendTo="body"
+            styleClass="w-full estado-filter-select"
+            panelStyleClass="estado-filter-panel"
+          />
+        }
+      </div>
+      <div class="form-field">
+        <label for="com-admin">Comentario interno (opcional)</label>
+        <textarea
+          id="com-admin"
+          pInputText
+          rows="3"
+          maxlength="2000"
+          [(ngModel)]="comentarioAdmin"
+          placeholder="Notas para el funcionario o mantenimiento"
+        ></textarea>
+      </div>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      [disabled]="procesando"
+      (click)="cerrarGestion()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Confirmar"
+      icon="pi pi-check"
+      class="p-button-info btn-dialog btn-dialog-primary"
+      [loading]="procesando"
+      [disabled]="procesando"
+      (click)="confirmarGestion()"
+    ></button>
+  </ng-template>
+</p-dialog>

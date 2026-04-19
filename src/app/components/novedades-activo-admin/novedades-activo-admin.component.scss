@@ -1,0 +1,222 @@
+.panel-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  min-height: 400px;
+}
+
+.panel-header {
+  margin-bottom: 12px;
+
+  .panel-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #00008b;
+    margin: 0;
+  }
+}
+
+.intro-texto {
+  margin: 0 0 20px;
+  font-size: 0.9375rem;
+  color: #4b5563;
+  line-height: 1.5;
+  max-width: 48rem;
+}
+
+.sin-accion {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.estado-novedad-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.estado-novedad--pendiente {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.estado-novedad--enviado {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.estado-novedad--cerrado {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.dialog-resumen {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: #111827;
+}
+
+.dialog-desc {
+  margin: 0;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #374151;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.dialog-form {
+  display: grid;
+  gap: 14px;
+  padding: 0.5rem 0;
+  min-width: 0;
+
+  .form-field {
+    margin-bottom: 0;
+  }
+}
+
+.form-field {
+  margin-bottom: 14px;
+
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #00008b;
+    margin-bottom: 6px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 84px;
+    border: 1px solid #93c5fd;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+    resize: vertical;
+    line-height: 1.4;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+
+    &:hover {
+      border-color: #60a5fa;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+  }
+}
+
+// Mismo criterio que solicitar-asignación / form-nuevo-activo
+:host ::ng-deep .p-dialog {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+
+  .p-dialog-header,
+  .p-dialog-content,
+  .p-dialog-footer {
+    background: #fff;
+  }
+
+  .p-dialog-header {
+    border-radius: 16px 16px 0 0;
+    padding: 1rem 1.25rem;
+
+    .p-dialog-title {
+      color: #00008b;
+      font-size: 1.25rem;
+      font-weight: 600;
+      border-bottom: 2px solid #00008b;
+      padding-bottom: 0.35rem;
+      display: inline-block;
+    }
+  }
+
+  .p-dialog-footer {
+    border-radius: 0 0 16px 16px;
+  }
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 1.5rem 1.75rem 1.5rem;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  padding: 1.1rem 1.75rem 1.4rem;
+  gap: 0.75rem;
+
+  .p-button.btn-dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+    transition: filter 0.2s, box-shadow 0.2s;
+
+    &:hover:enabled {
+      filter: brightness(1.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .p-button.btn-dialog-primary.p-button-info {
+    background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%) !important;
+    color: #fff !important;
+    border: none !important;
+
+    .p-button-icon {
+      color: #fff !important;
+    }
+  }
+
+  .p-button.p-button-secondary.btn-dialog {
+    background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+    color: #475569 !important;
+    border: none !important;
+
+    .p-button-icon {
+      color: #475569 !important;
+    }
+  }
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer .p-button.btn-dialog-primary.p-button-info {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer .p-button.btn-dialog-primary.p-button-info:enabled:hover,
+:host ::ng-deep .p-dialog .p-dialog-footer .p-button.btn-dialog-primary.p-button-info:enabled:active,
+:host ::ng-deep .p-dialog .p-dialog-footer .p-button.btn-dialog-primary.p-button-info:enabled:focus,
+:host ::ng-deep .p-dialog .p-dialog-footer .p-button.btn-dialog-primary.p-button-info:enabled:focus-visible,
+:host
+  ::ng-deep
+  .p-dialog
+  .p-dialog-footer
+  .p-button.btn-dialog-primary.p-button-info.p-focus {
+  border: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}

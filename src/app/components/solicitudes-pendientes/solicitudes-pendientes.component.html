@@ -56,26 +56,72 @@
         <td>{{ solicitud.motivo != null && solicitud.motivo !== '' ? solicitud.motivo : '—' }}</td>
         <td>
           <div class="table-actions">
-            <button type="button" class="action-view" title="Ver detalle" (click)="verDetalle(solicitud)">
-              <i class="pi pi-eye"></i>
-            </button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-eye"
+              class="p-button-text p-button-rounded table-action-btn"
+              title="Ver detalle"
+              (click)="verDetalle(solicitud); $event.stopPropagation()"
+            ></button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-file"
+              class="p-button-text p-button-rounded table-action-btn table-action-btn--pdf"
+              [title]="
+                puedeDescargarFirmado(solicitud)
+                  ? 'Ver PDF firmado'
+                  : 'Aún no hay PDF firmado para esta solicitud'
+              "
+              [disabled]="!puedeDescargarFirmado(solicitud)"
+              (click)="verPdfFirmado(solicitud, $event)"
+            ></button>
             @if (esPuedeIrACrearAsignacion(solicitud)) {
               <button
+                pButton
                 type="button"
-                class="action-asignacion"
+                icon="pi pi-link"
+                class="p-button-text p-button-rounded table-action-btn table-action-btn--asignacion"
                 title="Ir a crear asignación"
-                (click)="irACrearAsignacion(solicitud)"
-              >
-                <i class="pi pi-link"></i>
-              </button>
+                (click)="irACrearAsignacion(solicitud); $event.stopPropagation()"
+              ></button>
             }
             @if (esPendiente(solicitud)) {
-              <button type="button" class="action-approve" title="Aprobar" (click)="abrirAprobar(solicitud)">
-                <i class="pi pi-check"></i>
-              </button>
-              <button type="button" class="action-reject" title="Rechazar" (click)="abrirRechazar(solicitud)">
-                <i class="pi pi-times"></i>
-              </button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-check"
+                class="p-button-text p-button-rounded table-action-btn table-action-btn--aprobar"
+                title="Aprobar"
+                (click)="abrirAprobar(solicitud); $event.stopPropagation()"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-times"
+                class="p-button-text p-button-rounded table-action-btn table-action-btn--rechazar"
+                title="Rechazar"
+                (click)="abrirRechazar(solicitud); $event.stopPropagation()"
+              ></button>
+            }
+            @if (esFirmado(solicitud)) {
+              <button
+                pButton
+                type="button"
+                icon="pi pi-check-circle"
+                class="p-button-text p-button-rounded table-action-btn table-action-btn--aprobar-final"
+                title="Aprobar final"
+                (click)="abrirAprobarFinal(solicitud); $event.stopPropagation()"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-times-circle"
+                class="p-button-text p-button-rounded table-action-btn table-action-btn--rechazar-firma"
+                title="Rechazar firma"
+                (click)="abrirRechazarFirma(solicitud); $event.stopPropagation()"
+              ></button>
             }
           </div>
         </td>
@@ -106,7 +152,7 @@
         <h3>Funcionario</h3>
         <p><strong>Nombre:</strong> {{ solicitudDetalle.empleado.nombre }}</p>
         <p><strong>Cargo:</strong> {{ solicitudDetalle.empleado.cargo || '�' }}</p>
-        <p><strong>�rea:</strong> {{ solicitudDetalle.empleado.area || '�' }}</p>
+        <p><strong>Área:</strong> {{ solicitudDetalle.empleado.area || '�' }}</p>
       </div>
       <div class="detalle-seccion">
         <h3>Activo solicitado</h3>
@@ -144,7 +190,41 @@
 </p-dialog>
 
 <p-dialog
-  header="Aprobar solicitud"
+  header="PDF firmado"
+  [(visible)]="mostrarVisorPdfFirmado"
+  [appendTo]="'body'"
+  [modal]="true"
+  [style]="{ width: '78vw', maxWidth: '1100px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  styleClass="visor-pdf-dialog"
+  (onHide)="cerrarVisorPdfFirmado()"
+>
+  @if (visorPdfFirmadoCargando) {
+    <div class="visor-pdf-loading" role="status" aria-live="polite">
+      <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
+      <span>Cargando PDF firmado…</span>
+    </div>
+  } @else if (visorPdfFirmadoSafeUrl) {
+    <iframe class="visor-pdf-frame" [src]="visorPdfFirmadoSafeUrl" title="Visor PDF firmado"></iframe>
+  } @else {
+    <p class="confirm-text">No hay PDF disponible para visualizar.</p>
+  }
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cerrar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cerrarVisorPdfFirmado()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [header]="tituloDialogoAprobar()"
   [(visible)]="mostrarConfirmarAprobar"
   [modal]="true"
   [style]="{ width: '560px', maxWidth: '95vw' }"
@@ -155,7 +235,7 @@
 >
   <div class="dialog-form">
     <p class="confirm-text">
-      �Deseas aprobar la solicitud de
+      ¿Deseas aprobar la solicitud de
       <strong>{{ solicitudEnProceso?.empleado?.nombre }}</strong>
       para el activo
       <strong>{{ solicitudEnProceso?.activo?.tipo }} - {{ solicitudEnProceso?.activo?.marca }}</strong>?
@@ -168,7 +248,7 @@
         rows="3"
         maxlength="500"
         [(ngModel)]="comentarioAdmin"
-        placeholder="Ej: aprobado para gesti�n inmediata"
+        placeholder="Ej: aprobado para gestión inmediata"
       ></textarea>
     </div>
   </div>
@@ -185,7 +265,7 @@
     <button
       pButton
       type="button"
-      label="Aprobar"
+      [label]="etiquetaBotonAprobar()"
       icon="pi pi-check"
       class="p-button-info btn-dialog btn-dialog-primary"
       [loading]="procesando"
@@ -196,7 +276,7 @@
 </p-dialog>
 
 <p-dialog
-  header="Rechazar solicitud"
+  [header]="tituloDialogoRechazar()"
   [(visible)]="mostrarConfirmarRechazar"
   [modal]="true"
   [style]="{ width: '560px', maxWidth: '95vw' }"
@@ -207,13 +287,15 @@
 >
   <div class="dialog-form">
     <p class="confirm-text">
-      �Deseas rechazar la solicitud de
+      ¿Deseas rechazar la solicitud de
       <strong>{{ solicitudEnProceso?.empleado?.nombre }}</strong>
       para el activo
       <strong>{{ solicitudEnProceso?.activo?.tipo }} - {{ solicitudEnProceso?.activo?.marca }}</strong>?
     </p>
     <div class="form-field">
-      <label for="rechazar-comentario">Motivo del rechazo (obligatorio)</label>
+      <label for="rechazar-comentario">
+        {{ modoRechazo === 'firma' ? 'Motivo del rechazo de firma (obligatorio)' : 'Motivo del rechazo (obligatorio)' }}
+      </label>
       <textarea
         id="rechazar-comentario"
         pInputText
@@ -240,7 +322,7 @@
     <button
       pButton
       type="button"
-      label="Rechazar"
+      [label]="etiquetaBotonRechazar()"
       icon="pi pi-times"
       class="p-button-danger btn-dialog btn-dialog-danger"
       [loading]="procesando"

@@ -1,0 +1,54 @@
+<p-dialog
+  header="Detalle de solicitud"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '560px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="detalle-solicitud-dialog"
+  (onHide)="cerrar()"
+>
+  @if (solicitudDetalle) {
+    <div class="detalle-solicitud">
+      <div class="detalle-bloque">
+        <h3>Activo</h3>
+        <p><strong>Tipo:</strong> {{ solicitudDetalle.activo.tipo }}</p>
+        <p><strong>Marca:</strong> {{ solicitudDetalle.activo.marca }}</p>
+        <p><strong>Modelo:</strong> {{ solicitudDetalle.activo.modelo || '—' }}</p>
+        <p><strong>Serial:</strong> {{ solicitudDetalle.activo.serial || '—' }}</p>
+      </div>
+
+      @if (esSolicitudRechazada(solicitudDetalle)) {
+        <div class="detalle-rechazo">
+          <h3>{{ tituloMotivoRechazo(solicitudDetalle) }}</h3>
+          <p>{{ solicitudDetalle.comentarioAdmin?.trim() || 'Sin comentario administrativo.' }}</p>
+        </div>
+      }
+
+      <div class="detalle-bloque">
+        <h3>Solicitud</h3>
+        <p><strong>Estado:</strong> {{ solicitudDetalle.estadoSolicitud }}</p>
+        <p><strong>Fecha:</strong> {{ solicitudDetalle.fechaSolicitud | date:'medium' }}</p>
+        <p><strong>Motivo:</strong> {{ solicitudDetalle.motivo || '—' }}</p>
+        @if (solicitudDetalle.fechaRespuesta) {
+          <p><strong>Fecha respuesta:</strong> {{ solicitudDetalle.fechaRespuesta | date:'medium' }}</p>
+        }
+        @if (solicitudDetalle.comentarioAdmin) {
+          <p><strong>Comentario administración:</strong> {{ solicitudDetalle.comentarioAdmin }}</p>
+        }
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cerrar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      (click)="cerrar()"
+    ></button>
+  </ng-template>
+</p-dialog>
+

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Empleado } from '../../domain';
+import { Empleado, EmpleadoAltaResultado } from '../../domain';
 import { EmpleadoRepositoryPort } from '../../application/ports/empleado.repository.port';
 import { EMPLEADO_REPOSITORY } from '../../application/ports/injection-tokens';
 
@@ -14,7 +14,9 @@ export class EmpleadoService {
     return this.repository.getEmpleados();
   }
 
-  addEmpleado(empleado: Partial<Empleado>): Observable<Empleado> {
+  addEmpleado(
+    empleado: Partial<Empleado> & { username?: string; password?: string },
+  ): Observable<EmpleadoAltaResultado> {
     return this.repository.addEmpleado(empleado);
   }
 

@@ -324,6 +324,119 @@ body {
   }
 }
 
+// p-select con styleClass="estado-filter-select" / panelStyleClass="estado-filter-panel"
+// (filtro Estado en Activos, reportar novedad, etc.). Con appendTo="body" el overlay
+// queda fuera del :host del componente: el panel solo puede estilizarse aquí, no con ::ng-deep.
+.p-select.estado-filter-select {
+  border: 1px solid #93c5fd !important;
+  border-radius: 10px !important;
+  min-height: 42px;
+  box-shadow: none !important;
+  background: #fff !important;
+  display: flex;
+  align-items: center;
+  padding: 0 !important;
+  overflow: visible;
+
+  .p-select-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #334155;
+    padding: 0.6rem 0.8rem !important;
+  }
+
+  .p-select-label.p-placeholder {
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .p-select-dropdown {
+    color: #64748b;
+    width: 2.25rem;
+  }
+
+  .p-select-dropdown-icon {
+    color: #64748b;
+  }
+
+  &:hover {
+    border-color: #60a5fa !important;
+  }
+
+  &.p-focus,
+  &:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
+    outline: none !important;
+  }
+
+  button:focus,
+  button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
+
+.p-select-overlay.estado-filter-panel {
+  z-index: 13000 !important;
+  margin-top: 4px;
+  padding: 6px;
+  background: #fff !important;
+  border: 1px solid #93c5fd !important;
+  border-radius: 10px !important;
+  box-shadow:
+    0 8px 22px rgba(15, 23, 42, 0.12),
+    0 4px 10px rgba(15, 23, 42, 0.06) !important;
+  overflow: hidden;
+
+  .p-select-list-container {
+    max-height: 320px;
+  }
+
+  .p-select-list {
+    padding: 4px 0;
+    gap: 0;
+  }
+
+  .p-select-option {
+    margin: 2px 6px;
+    padding: 10px 12px !important;
+    border-radius: 8px;
+    transition: background-color 0.15s ease;
+
+    .p-select-option-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #334155;
+    }
+  }
+
+  .p-select-option:not(.p-disabled):hover,
+  .p-select-option.p-focus {
+    background: #f8fbff !important;
+  }
+
+  .p-select-option:not(.p-disabled):hover .p-select-option-label,
+  .p-select-option.p-focus .p-select-option-label {
+    color: #1e3a8a;
+  }
+
+  .p-select-option.p-select-option-selected {
+    background: #eaf2ff !important;
+
+    .p-select-option-label {
+      font-weight: 600;
+      color: #1d4ed8;
+    }
+  }
+
+  .p-select-empty-message {
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+}
+
 // Toasts: centro inferior + mensaje de éxito en verde
 .p-toast.toast-app.p-toast-bottom-center {
   left: 50% !important;

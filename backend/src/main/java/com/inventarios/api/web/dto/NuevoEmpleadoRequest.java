@@ -9,6 +9,11 @@ public class NuevoEmpleadoRequest {
   @NotBlank private String area;
   private Boolean activo;
 
+  /** Opcional en alta: si se omite usuario y contraseña, el servidor los genera. */
+  private String username;
+
+  private String password;
+
   public String getNombre() {
     return nombre;
   }
@@ -39,5 +44,21 @@ public class NuevoEmpleadoRequest {
 
   public void setActivo(Boolean activo) {
     this.activo = activo;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 }

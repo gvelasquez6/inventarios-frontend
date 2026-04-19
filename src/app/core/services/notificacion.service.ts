@@ -156,6 +156,66 @@ export class NotificacionService {
     });
   }
 
+  solicitudPendienteFirma(): void {
+    this.messages.add({
+      severity: 'success',
+      summary: 'PDF generado',
+      detail: 'La solicitud quedó en estado pendiente de firma.',
+      life: 4500,
+      styleClass: 'toast-msg-exito',
+    });
+  }
+
+  solicitudPdfFirmadoSubido(): void {
+    this.messages.add({
+      severity: 'success',
+      summary: 'PDF firmado recibido',
+      detail: 'El documento firmado se cargó correctamente.',
+      life: 4500,
+      styleClass: 'toast-msg-exito',
+    });
+  }
+
+  solicitudFirmaAprobadaFinal(): void {
+    this.messages.add({
+      severity: 'success',
+      summary: 'Solicitud completada',
+      detail: 'La revisión final de firma fue aprobada.',
+      life: 4500,
+      styleClass: 'toast-msg-exito',
+    });
+  }
+
+  solicitudFirmaRechazadaFinal(): void {
+    this.messages.add({
+      severity: 'success',
+      summary: 'Firma rechazada',
+      detail: 'La firma fue rechazada por administración.',
+      life: 4500,
+      styleClass: 'toast-msg-exito',
+    });
+  }
+
+  novedadReportada(): void {
+    this.messages.add({
+      severity: 'success',
+      summary: 'Reporte enviado',
+      detail: 'Tu novedad fue registrada. El administrador podrá gestionarla.',
+      life: 4500,
+      styleClass: 'toast-msg-exito',
+    });
+  }
+
+  novedadEstadoActualizado(): void {
+    this.messages.add({
+      severity: 'success',
+      summary: 'Novedad actualizada',
+      detail: 'El estado del reporte se guardó correctamente.',
+      life: 4500,
+      styleClass: 'toast-msg-exito',
+    });
+  }
+
   /**
    * Mensaje de error (toast rojo, mismo estilo que el de éxito).
    * @param detalle Texto principal del mensaje

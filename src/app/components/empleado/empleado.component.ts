@@ -6,7 +6,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { InventarioService } from '../../application/use-cases/inventario.service';
-import { AuthService } from '../../application/use-cases/auth.service';
 import { NotificacionService } from '../../core/services/notificacion.service';
 import { Empleado } from '../../domain';
 import {
@@ -51,12 +50,11 @@ export class EmpleadoComponent implements OnInit {
 
   constructor(
     private readonly inventario: InventarioService,
-    private readonly auth: AuthService,
     private readonly notificacion: NotificacionService,
   ) {}
 
   ngOnInit(): void {
-    this.inventario.getEmpleados().subscribe(list => {
+    this.inventario.getEmpleados().subscribe((list) => {
       this.empleados = list;
       this.sincronizarEstados(list);
       this.filtrar();
@@ -118,47 +116,67 @@ export class EmpleadoComponent implements OnInit {
       payload.idEmpleado == null ? NaN : Number(payload.idEmpleado);
     const esEdicion = Number.isFinite(id) && id > 0;
 
-    const peticion = esEdicion
-      ? this.inventario.updateEmpleado(id, {
+    const onError = (err: Error) =>
+      this.notificacion.error(
+        err?.message ??
+          (esEdicion
+            ? 'No se pudo actualizar el empleado. Comprueba que el API esté en marcha.'
+            : 'No se pudo crear el empleado. Comprueba que el API esté en marcha.'),
+        esEdicion ? 'Error al actualizar empleado' : 'Error al crear empleado',
+      );
+
+    const postExito = () => {
+      this.inventario.getEmpleados().subscribe((list) => {
+        this.empleados = list;
+        this.sincronizarEstados(list);
+        this.filtrar();
+      });
+      this.mostrarDialogo = false;
+      this.empleadoEnEdicion = null;
+    };
+
+    if (esEdicion) {
+      this.inventario
+        .updateEmpleado(id, {
           nombre: payload.nombre,
           cargo: payload.cargo,
           area: payload.area,
         })
-      : this.inventario.addEmpleado({
-          nombre: payload.nombre,
-          cargo: payload.cargo,
-          area: payload.area,
+        .subscribe({
+          next: () => {
+            this.notificacion.empleadoActualizado();
+            postExito();
+          },
+          error: onError,
         });
+      return;
+    }
 
-    peticion.subscribe({
-      next: (empleadoGuardado) => {
-        if (esEdicion) {
-          this.notificacion.empleadoActualizado();
-        } else {
+    this.inventario
+      .addEmpleado({
+        nombre: payload.nombre,
+        cargo: payload.cargo,
+        area: payload.area,
+        username: payload.username?.trim() || undefined,
+        password: payload.password || undefined,
+      })
+      .subscribe({
+        next: (alta) => {
           this.notificacion.empleadoCreado();
-          const credenciales = this.auth.ensureFuncionarioAccount(empleadoGuardado);
-          if (credenciales) {
-            this.credencialesFuncionario = { ...credenciales };
+          const u = alta.credencialUsuario?.trim() ?? '';
+          const p = alta.credencialPassword ?? '';
+          this.credencialesFuncionario = {
+            username: u,
+            password: p,
+            creado: alta.credencialGenerada ?? false,
+          };
+          if (u) {
             this.mostrarCredencialesFuncionario = true;
           }
-        }
-        this.inventario.getEmpleados().subscribe((list) => {
-          this.empleados = list;
-          this.sincronizarEstados(list);
-          this.filtrar();
-        });
-        this.mostrarDialogo = false;
-        this.empleadoEnEdicion = null;
-      },
-      error: (err: Error) =>
-        this.notificacion.error(
-          err?.message ??
-            (esEdicion
-              ? 'No se pudo actualizar el empleado. Comprueba que el API esté en marcha.'
-              : 'No se pudo crear el empleado. Comprueba que el API esté en marcha.'),
-          esEdicion ? 'Error al actualizar empleado' : 'Error al crear empleado',
-        ),
-    });
+          postExito();
+        },
+        error: onError,
+      });
   }
 
   estaActivo(empleado: Empleado): boolean {

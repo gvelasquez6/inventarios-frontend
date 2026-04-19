@@ -435,11 +435,31 @@
 
 .login-actions {
   margin-top: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
 
-  ::ng-deep .p-button.btn-login-primary.p-button-info {
+  /* Directiva pButton: ancho completo del contenedor (fluid añade p-button-fluid en el botón) */
+  > button.p-button {
+    display: block;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  /* Botón interno: mismo aspecto en normal, disabled y loading (p-button-loading) */
+  ::ng-deep .p-button.btn-login-primary {
+    width: 100% !important;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     min-height: 44px;
-    justify-content: center;
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem;
     border: none;
     border-radius: 8px;
     padding: 12px 20px;
@@ -447,22 +467,38 @@
     font-size: clamp(0.875rem, 2.5vw, 0.9375rem);
     background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%) !important;
     color: #fff !important;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+    transition: filter 0.2s, box-shadow 0.2s;
 
     @media (min-width: 768px) {
       min-height: auto;
       padding: 10px 20px;
+      font-size: 0.9375rem;
     }
 
-    .p-button-icon {
+    .p-button-icon,
+    .p-button-loading-icon {
       color: #fff !important;
+      flex-shrink: 0;
     }
 
-    &:hover:not(:disabled) {
+    .p-button-label {
+      flex: 0 1 auto;
+      text-align: center;
+    }
+
+    &.p-button-loading {
+      width: 100% !important;
+      justify-content: center !important;
+    }
+
+    &:hover:not(:disabled):not(.p-disabled) {
       filter: brightness(1.05);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
-    &:disabled {
+    &:disabled,
+    &.p-disabled {
       opacity: 0.55;
       cursor: not-allowed;
       filter: grayscale(0.15);

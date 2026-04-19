@@ -15,4 +15,9 @@ export abstract class SolicitudAsignacionRepositoryPort {
   abstract deleteSolicitud(idSolicitud: number, idEmpleado: number): Observable<void>;
   abstract aprobarSolicitud(idSolicitud: number, comentarioAdmin?: string): Observable<SolicitudAsignacion>;
   abstract rechazarSolicitud(idSolicitud: number, comentarioAdmin?: string): Observable<SolicitudAsignacion>;
+  abstract descargarPdfOriginal(idSolicitud: number): Observable<Blob>;
+  abstract descargarPdfFirmado(idSolicitud: number): Observable<Blob>;
+  abstract subirPdfFirmado(idSolicitud: number, archivo: File): Observable<SolicitudAsignacion>;
+  abstract aprobarFinal(idSolicitud: number, comentarioAdmin?: string): Observable<SolicitudAsignacion>;
+  abstract rechazarFirma(idSolicitud: number, comentarioAdmin: string): Observable<SolicitudAsignacion>;
 }

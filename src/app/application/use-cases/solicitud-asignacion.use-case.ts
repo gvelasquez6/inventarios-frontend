@@ -46,4 +46,24 @@ export class SolicitudAsignacionUseCase {
   rechazarSolicitud(idSolicitud: number, comentarioAdmin?: string): Observable<SolicitudAsignacion> {
     return this.repository.rechazarSolicitud(idSolicitud, comentarioAdmin);
   }
+
+  descargarPdfOriginal(idSolicitud: number): Observable<Blob> {
+    return this.repository.descargarPdfOriginal(idSolicitud);
+  }
+
+  descargarPdfFirmado(idSolicitud: number): Observable<Blob> {
+    return this.repository.descargarPdfFirmado(idSolicitud);
+  }
+
+  subirPdfFirmado(idSolicitud: number, archivo: File): Observable<SolicitudAsignacion> {
+    return this.repository.subirPdfFirmado(idSolicitud, archivo);
+  }
+
+  aprobarFinal(idSolicitud: number, comentarioAdmin?: string): Observable<SolicitudAsignacion> {
+    return this.repository.aprobarFinal(idSolicitud, comentarioAdmin);
+  }
+
+  rechazarFirma(idSolicitud: number, comentarioAdmin: string): Observable<SolicitudAsignacion> {
+    return this.repository.rechazarFirma(idSolicitud, comentarioAdmin);
+  }
 }

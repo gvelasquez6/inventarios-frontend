@@ -97,6 +97,26 @@
     background: #dbeafe;
     color: #1d4ed8;
   }
+
+  &--estado-pendiente-firma {
+    background: #e0f2fe;
+    color: #0369a1;
+  }
+
+  &--estado-firmado {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
+
+  &--estado-completado {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  &--estado-rechazado-firma {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
 }
 
 :host ::ng-deep .panel-table {
@@ -111,56 +131,90 @@
   .p-datatable-tbody > tr.fila-solicitud--estado-asignado {
     background: rgba(219, 234, 254, 0.35);
   }
+
+  .p-datatable-tbody > tr.fila-solicitud--estado-pendiente-firma {
+    background: rgba(224, 242, 254, 0.4);
+  }
+
+  .p-datatable-tbody > tr.fila-solicitud--estado-firmado {
+    background: rgba(237, 233, 254, 0.35);
+  }
+
+  .p-datatable-tbody > tr.fila-solicitud--estado-completado {
+    background: rgba(220, 252, 231, 0.25);
+  }
+
+  .p-datatable-tbody > tr.fila-solicitud--estado-rechazado-firma {
+    background: rgba(254, 226, 226, 0.25);
+  }
 }
 
+/** Misma línea visual que `solicitar-asignacion`: PrimeNG `p-button-text` + redondeado. */
 .table-actions {
   display: flex;
   gap: 6px;
   align-items: center;
+  flex-wrap: wrap;
+}
 
-  button {
-    width: 36px;
-    height: 36px;
-    background: rgba(0, 0, 0, 0.04);
-    border: none;
-    border-radius: 8px;
-    color: #4b5563;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+:host ::ng-deep .table-actions .table-action-btn.p-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: #4b5563;
 
-    &:hover {
-      background: rgba(0, 0, 0, 0.08);
-      color: #111827;
-    }
+  &:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.06);
+    color: #111827;
+  }
 
-    &.action-approve {
-      color: #16a34a;
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
 
-      &:hover {
-        background: #ecfdf5;
-        color: #15803d;
-      }
-    }
+:host ::ng-deep .table-actions .table-action-btn--pdf.p-button {
+  color: #7c3aed;
 
-    &.action-reject {
-      color: #dc2626;
+  &:hover:not(:disabled) {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
 
-      &:hover {
-        background: #fef2f2;
-        color: #b91c1c;
-      }
-    }
+  &:disabled {
+    color: #94a3b8;
+    opacity: 1;
+    background: #f1f5f9;
+  }
+}
 
-    &.action-asignacion {
-      color: #2563eb;
+:host ::ng-deep .table-actions .table-action-btn--asignacion.p-button {
+  color: #2563eb;
 
-      &:hover {
-        background: #eff6ff;
-        color: #1d4ed8;
-      }
-    }
+  &:hover:not(:disabled) {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+}
+
+:host ::ng-deep .table-actions .table-action-btn--aprobar.p-button,
+:host ::ng-deep .table-actions .table-action-btn--aprobar-final.p-button {
+  color: #16a34a;
+
+  &:hover:not(:disabled) {
+    background: #ecfdf5;
+    color: #15803d;
+  }
+}
+
+:host ::ng-deep .table-actions .table-action-btn--rechazar.p-button,
+:host ::ng-deep .table-actions .table-action-btn--rechazar-firma.p-button {
+  color: #dc2626;
+
+  &:hover:not(:disabled) {
+    background: #fef2f2;
+    color: #b91c1c;
   }
 }
 
@@ -204,6 +258,31 @@
 .dialog-form {
   display: grid;
   gap: 12px;
+}
+
+.visor-pdf-frame {
+  width: 100%;
+  height: 68vh;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.visor-pdf-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 200px;
+  padding: 24px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+
+  .pi-spinner {
+    font-size: 1.5rem;
+    color: #2563eb;
+  }
 }
 
 .form-field {

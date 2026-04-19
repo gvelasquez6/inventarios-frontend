@@ -24,6 +24,10 @@
             <i class="pi pi-send"></i>
             <span class="nav-label">Solicitudes</span>
           </a>
+          <a routerLink="/novedades-activo" routerLinkActive="active" class="nav-item" title="Novedades de activos">
+            <i class="pi pi-wrench"></i>
+            <span class="nav-label">Novedades</span>
+          </a>
         }
         @if (esFuncionario) {
           <a routerLink="/mis-asignaciones" routerLinkActive="active" class="nav-item" title="Mis asignaciones">
@@ -33,6 +37,10 @@
           <a routerLink="/solicitar-asignacion" routerLinkActive="active" class="nav-item" title="Solicitar asignación">
             <i class="pi pi-send"></i>
             <span class="nav-label">Solicitar activo</span>
+          </a>
+          <a routerLink="/reportar-novedad" routerLinkActive="active" class="nav-item" title="Tus reportes de novedad y nuevo reporte">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span class="nav-label">Mis novedades</span>
           </a>
         }
       </nav>

@@ -110,4 +110,53 @@ export class ApiSolicitudAsignacionRepository implements SolicitudAsignacionRepo
         ),
       );
   }
+
+  descargarPdfOriginal(idSolicitud: number): Observable<Blob> {
+    return this.http.get(`${this.url}/${idSolicitud}/pdf-original`, { responseType: 'blob' }).pipe(
+      catchError((err: HttpErrorResponse) =>
+        throwError(() => new Error(mensajeErrorHttp(err, 'No se pudo descargar el PDF original.'))),
+      ),
+    );
+  }
+
+  descargarPdfFirmado(idSolicitud: number): Observable<Blob> {
+    return this.http.get(`${this.url}/${idSolicitud}/pdf-firmado`, { responseType: 'blob' }).pipe(
+      catchError((err: HttpErrorResponse) =>
+        throwError(() => new Error(mensajeErrorHttp(err, 'No se pudo descargar el PDF firmado.'))),
+      ),
+    );
+  }
+
+  subirPdfFirmado(idSolicitud: number, archivo: File): Observable<SolicitudAsignacion> {
+    const body = new FormData();
+    body.append('file', archivo);
+    return this.http.post<SolicitudRaw>(`${this.url}/${idSolicitud}/pdf-firmado`, body).pipe(
+      map((row) => normalizarSolicitud(row)),
+      catchError((err: HttpErrorResponse) =>
+        throwError(() => new Error(mensajeErrorHttp(err, 'No se pudo subir el PDF firmado.'))),
+      ),
+    );
+  }
+
+  aprobarFinal(idSolicitud: number, comentarioAdmin?: string): Observable<SolicitudAsignacion> {
+    return this.http
+      .put<SolicitudRaw>(`${this.url}/${idSolicitud}/aprobar-final`, { comentarioAdmin: comentarioAdmin || null })
+      .pipe(
+        map((row) => normalizarSolicitud(row)),
+        catchError((err: HttpErrorResponse) =>
+          throwError(() => new Error(mensajeErrorHttp(err, 'No se pudo aprobar la firma final.'))),
+        ),
+      );
+  }
+
+  rechazarFirma(idSolicitud: number, comentarioAdmin: string): Observable<SolicitudAsignacion> {
+    return this.http
+      .put<SolicitudRaw>(`${this.url}/${idSolicitud}/rechazar-firma`, { comentarioAdmin })
+      .pipe(
+        map((row) => normalizarSolicitud(row)),
+        catchError((err: HttpErrorResponse) =>
+          throwError(() => new Error(mensajeErrorHttp(err, 'No se pudo rechazar la firma.'))),
+        ),
+      );
+  }
 }

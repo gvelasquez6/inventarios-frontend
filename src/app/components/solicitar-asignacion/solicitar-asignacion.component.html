@@ -1,480 +1,158 @@
 <div class="panel-card">
-
   <div class="panel-header">
-
     <div class="panel-header-title">
-
       <h1 class="panel-title">Solicitar asignación</h1>
-
     </div>
-
     <div class="panel-header-actions">
-
       <button type="button" class="btn-add" (click)="abrirDialogo()">
-
         <i class="pi pi-plus"></i>
-
         Nueva solicitud
-
       </button>
-
     </div>
-
   </div>
-
-
 
   <div class="filter-bar">
-
     <div class="filter-group">
-
       <label>Buscar solicitud</label>
-
       <div class="search-input-wrap">
-
         <i class="pi pi-search"></i>
-
         <input
-
           type="text"
-
           pInputText
-
           [(ngModel)]="busqueda"
-
           (ngModelChange)="filtrar()"
-
           placeholder="Buscar por activo o estado"
-
         />
-
       </div>
-
     </div>
-
   </div>
 
-
-
   <p-table
-
     [value]="solicitudesFiltradas"
-
     [paginator]="true"
-
     [rows]="10"
-
     [rowsPerPageOptions]="[5, 10, 20]"
-
     responsiveLayout="scroll"
-
     styleClass="panel-table"
-
     [tableStyle]="{ 'min-width': '54rem' }"
-
   >
-
     <ng-template pTemplate="header">
-
       <tr>
-
         <th>Activo</th>
-
         <th>Serial</th>
-
         <th>Estado solicitud</th>
-
         <th>Fecha</th>
-
         <th>Motivo</th>
-
+        <th>Respuesta admin</th>
         <th>Acciones</th>
-
       </tr>
-
     </ng-template>
 
     <ng-template pTemplate="body" let-solicitud>
-
       <tr>
-
         <td>{{ solicitud.activo?.tipo }} - {{ solicitud.activo?.marca }}</td>
-
         <td>{{ solicitud.activo?.serial }}</td>
-
         <td>
-
           <span class="estado-badge" [ngClass]="solicitud.estadoSolicitud?.toLowerCase()">
-
             <span class="dot"></span>
-
             {{ solicitud.estadoSolicitud }}
-
           </span>
-
         </td>
-
         <td>{{ solicitud.fechaSolicitud | date:'short' }}</td>
-
         <td>{{ solicitud.motivo || '—' }}</td>
-
+        <td [title]="motivoRechazo(solicitud)">{{ motivoRechazo(solicitud) }}</td>
         <td>
-
           <div class="table-actions">
-
             <button
-
               pButton
-
               type="button"
-
               icon="pi pi-eye"
-
               class="p-button-text p-button-rounded table-action-btn"
-
               title="Ver detalle"
-
               (click)="verDetalleSolicitud(solicitud)"
-
             ></button>
-
             <button
-
               pButton
-
               type="button"
-
+              icon="pi pi-download"
+              class="p-button-text p-button-rounded table-action-btn"
+              title="Descargar PDF de asignación"
+              [disabled]="!puedeDescargarPdfOriginal(solicitud)"
+              (click)="descargarPdfOriginal(solicitud)"
+            ></button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-upload"
+              class="p-button-text p-button-rounded table-action-btn"
+              title="Subir PDF de asignación firmado"
+              [disabled]="!esPendienteFirma(solicitud)"
+              (click)="abrirSubirFirmado(solicitud)"
+            ></button>
+            <button
+              pButton
+              type="button"
               icon="pi pi-pencil"
-
               class="p-button-text p-button-rounded table-action-btn"
-
               title="Editar solicitud"
-
               [disabled]="!esPendiente(solicitud)"
-
               (click)="editarSolicitud(solicitud)"
-
             ></button>
-
             <button
-
               pButton
-
               type="button"
-
               icon="pi pi-trash"
-
               class="p-button-text p-button-rounded table-action-btn"
-
               title="Eliminar solicitud"
-
               [disabled]="!esPendiente(solicitud)"
-
               (click)="solicitarEliminarSolicitud(solicitud)"
-
             ></button>
-
           </div>
-
         </td>
-
       </tr>
-
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
-
       <tr>
-
-        <td colspan="6">No tienes solicitudes registradas.</td>
-
+        <td colspan="7">No tienes solicitudes registradas.</td>
       </tr>
-
     </ng-template>
-
   </p-table>
-
 </div>
 
-
-
-<p-dialog
-
-  [header]="tituloDialogoSolicitud"
-
-  [(visible)]="mostrarDialogo"
-
-  [modal]="true"
-
-  [style]="{ width: '560px', maxWidth: '95vw' }"
-
-  [draggable]="false"
-
-  [resizable]="false"
-
-  (onHide)="cerrarDialogo()"
-
->
-
-  <div class="dialog-form">
-
-    <div class="form-field form-field--activo-select">
-
-      <label for="sol-activo">Activo (catálogo completo)</label>
-
-      <p-select
-
-        inputId="sol-activo"
-
-        [options]="opcionesActivos"
-
-        optionLabel="label"
-
-        optionValue="value"
-
-        [(ngModel)]="form.idActivo"
-
-        placeholder="Selecciona un activo del inventario"
-
-        [showClear]="true"
-
-        appendTo="body"
-
-        panelStyleClass="solicitud-activo-panel"
-
-        styleClass="w-full"
-
-      />
-
-    </div>
-
-    <div class="form-field">
-
-      <label for="sol-motivo">Motivo (opcional)</label>
-
-      <textarea
-
-        id="sol-motivo"
-
-        pInputText
-
-        rows="3"
-
-        maxlength="500"
-
-        [(ngModel)]="form.motivo"
-
-        placeholder="Describe por qué necesitas el activo"
-
-      ></textarea>
-
-    </div>
-
-  </div>
-
-  <ng-template pTemplate="footer">
-
-    <button
-
-      pButton
-
-      type="button"
-
-      label="Cancelar"
-
-      icon="pi pi-times"
-
-      class="p-button-secondary btn-dialog"
-
-      (click)="cerrarDialogo()"
-
-    ></button>
-
-    <button
-
-      pButton
-
-      type="button"
-
-      [label]="etiquetaBotonEnviar"
-
-      icon="pi pi-check"
-
-      class="p-button-info btn-dialog btn-dialog-primary"
-
-      [disabled]="!form.idActivo || enviando"
-
-      (click)="enviarSolicitud()"
-
-    ></button>
-
-  </ng-template>
-
-</p-dialog>
-
-
-
-<p-dialog
-
-  header="Detalle de solicitud"
-
-  [(visible)]="mostrarDetalleSolicitud"
-
-  [modal]="true"
-
-  [style]="{ width: '560px', maxWidth: '95vw' }"
-
-  [draggable]="false"
-
-  [resizable]="false"
-
-  styleClass="detalle-solicitud-dialog"
-
-  (onHide)="cerrarDetalleSolicitud()"
-
->
-
-  @if (solicitudDetalle) {
-
-    <div class="detalle-solicitud">
-
-      <div class="detalle-bloque">
-
-        <h3>Activo</h3>
-
-        <p><strong>Tipo:</strong> {{ solicitudDetalle.activo.tipo }}</p>
-
-        <p><strong>Marca:</strong> {{ solicitudDetalle.activo.marca }}</p>
-
-        <p><strong>Modelo:</strong> {{ solicitudDetalle.activo.modelo || '—' }}</p>
-
-        <p><strong>Serial:</strong> {{ solicitudDetalle.activo.serial || '—' }}</p>
-
-      </div>
-
-      <div class="detalle-bloque">
-
-        <h3>Solicitud</h3>
-
-        <p><strong>Estado:</strong> {{ solicitudDetalle.estadoSolicitud }}</p>
-
-        <p><strong>Fecha:</strong> {{ solicitudDetalle.fechaSolicitud | date:'medium' }}</p>
-
-        <p><strong>Motivo:</strong> {{ solicitudDetalle.motivo || '—' }}</p>
-
-        @if (solicitudDetalle.fechaRespuesta) {
-
-          <p><strong>Fecha respuesta:</strong> {{ solicitudDetalle.fechaRespuesta | date:'medium' }}</p>
-
-        }
-
-        @if (solicitudDetalle.comentarioAdmin) {
-
-          <p><strong>Comentario administración:</strong> {{ solicitudDetalle.comentarioAdmin }}</p>
-
-        }
-
-      </div>
-
-    </div>
-
-  }
-
-  <ng-template pTemplate="footer">
-
-    <button
-
-      pButton
-
-      type="button"
-
-      label="Cerrar"
-
-      icon="pi pi-times"
-
-      class="p-button-secondary btn-dialog"
-
-      (click)="cerrarDetalleSolicitud()"
-
-    ></button>
-
-  </ng-template>
-
-</p-dialog>
-
-
-
-<p-dialog
-
-  header="Confirmar eliminación"
-
-  [(visible)]="mostrarConfirmarEliminar"
-
-  [modal]="true"
-
-  [draggable]="false"
-
-  [resizable]="false"
-
-  [closable]="false"
-
-  [style]="{ width: '500px', maxWidth: '95vw' }"
-
-  styleClass="confirm-eliminar-solicitud-dialog"
-
->
-
-  <p class="confirm-eliminar-texto">
-
-    Vas a eliminar la solicitud del activo
-
-    <strong>{{ solicitudAEliminar?.activo?.tipo }} - {{ solicitudAEliminar?.activo?.marca }}</strong>
-
-    ({{ solicitudAEliminar?.activo?.serial || 'sin serial' }}). Esta acción no se puede deshacer.
-
-  </p>
-
-  <ng-template pTemplate="footer">
-
-    <button
-
-      pButton
-
-      type="button"
-
-      label="Cancelar"
-
-      icon="pi pi-times"
-
-      class="p-button-secondary btn-dialog"
-
-      [disabled]="eliminandoSolicitud"
-
-      (click)="cancelarEliminarSolicitud()"
-
-    ></button>
-
-    <button
-
-      pButton
-
-      type="button"
-
-      label="Eliminar"
-
-      icon="pi pi-trash"
-
-      class="p-button-danger btn-dialog btn-dialog-danger"
-
-      [disabled]="eliminandoSolicitud"
-
-      [loading]="eliminandoSolicitud"
-
-      (click)="confirmarEliminarSolicitud()"
-
-    ></button>
-
-  </ng-template>
-
-</p-dialog>
+<app-solicitud-form-dialog
+  [visible]="mostrarDialogo"
+  [tituloDialogo]="tituloDialogoSolicitud"
+  [etiquetaBotonEnviar]="etiquetaBotonEnviar"
+  [opcionesActivos]="opcionesActivos"
+  [form]="form"
+  [enviando]="enviando"
+  (visibleChange)="onVisibleDialogoSolicitud($event)"
+  (enviar)="enviarSolicitud()"
+/>
+
+<app-solicitud-detalle-dialog
+  [visible]="mostrarDetalleSolicitud"
+  [solicitudDetalle]="solicitudDetalle"
+  (visibleChange)="onVisibleDetalleSolicitud($event)"
+/>
+
+<app-solicitud-firmado-dialog
+  [visible]="mostrarSubirFirmado"
+  [solicitudParaFirma]="solicitudParaFirma"
+  [stagedPdfFirmado]="stagedPdfFirmado"
+  [subiendoFirmado]="subiendoFirmado"
+  (visibleChange)="onVisibleSubirFirmado($event)"
+  (seleccionarPdf)="seleccionarPdfFirmado($event)"
+  (quitarPdf)="quitarPdfFirmadoSeleccionado()"
+  (subirPdf)="subirPdfFirmadoSeleccionado()"
+/>
+
+<app-solicitud-confirmar-eliminar-dialog
+  [visible]="mostrarConfirmarEliminar"
+  [solicitud]="solicitudAEliminar"
+  [eliminando]="eliminandoSolicitud"
+  (cancelar)="cancelarEliminarSolicitud()"
+  (confirmar)="confirmarEliminarSolicitud()"
+/>
 

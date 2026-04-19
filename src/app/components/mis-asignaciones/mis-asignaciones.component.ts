@@ -1,6 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { TableModule } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '../../application/use-cases/auth.service';
@@ -18,16 +21,30 @@ import { CapitalizeFirstDirective } from '../../shared/directives/capitalize-fir
 export class MisAsignacionesComponent implements OnInit {
   private readonly inventario = inject(InventarioService);
   private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   busqueda = '';
   asignaciones: Asignacion[] = [];
   asignacionesFiltradas: Asignacion[] = [];
 
   ngOnInit(): void {
+    this.refrescarDesdeApi();
+
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        filter((e) => e.urlAfterRedirects.includes('/mis-asignaciones')),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => this.refrescarDesdeApi());
+  }
+
+  private refrescarDesdeApi(): void {
     const sesion = this.auth.session();
+    const idEmpleado = sesion?.idEmpleado == null ? null : Number(sesion.idEmpleado);
+    const nombreSesion = sesion?.nombre?.toLowerCase().trim() ?? '';
     this.inventario.getAsignaciones().subscribe((list) => {
-      const idEmpleado = sesion?.idEmpleado == null ? null : Number(sesion.idEmpleado);
-      const nombreSesion = sesion?.nombre?.toLowerCase().trim() ?? '';
       this.asignaciones =
         idEmpleado != null
           ? list.filter((a) => Number(a.empleado?.idEmpleado) === idEmpleado)
@@ -49,4 +66,3 @@ export class MisAsignacionesComponent implements OnInit {
     );
   }
 }
-

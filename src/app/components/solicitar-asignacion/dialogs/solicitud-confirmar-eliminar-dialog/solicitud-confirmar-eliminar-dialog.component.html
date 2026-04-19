@@ -1,0 +1,38 @@
+<p-dialog
+  header="Confirmar eliminación"
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ width: '500px', maxWidth: '95vw' }"
+  styleClass="confirm-eliminar-solicitud-dialog"
+>
+  <p class="confirm-eliminar-texto">
+    Vas a eliminar la solicitud del activo <strong>{{ solicitud?.activo?.tipo }} - {{ solicitud?.activo?.marca }}</strong>
+    ({{ solicitud?.activo?.serial || 'sin serial' }}). Esta acción no se puede deshacer.
+  </p>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-secondary btn-dialog"
+      [disabled]="eliminando"
+      (click)="cancelarDialogo()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Eliminar"
+      icon="pi pi-trash"
+      class="p-button-danger btn-dialog btn-dialog-danger"
+      [disabled]="eliminando"
+      [loading]="eliminando"
+      (click)="confirmar.emit()"
+    ></button>
+  </ng-template>
+</p-dialog>
+

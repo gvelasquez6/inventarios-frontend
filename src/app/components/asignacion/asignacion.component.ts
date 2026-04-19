@@ -1,6 +1,8 @@
-import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -34,6 +36,7 @@ import { CapitalizeFirstDirective } from '../../shared/directives/capitalize-fir
 })
 export class AsignacionComponent implements OnInit {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly destroyRef = inject(DestroyRef);
 
   empleados: Empleado[] = [];
   activos: Activo[] = [];
@@ -67,6 +70,18 @@ export class AsignacionComponent implements OnInit {
       this.activos = list;
       this.intentarAbrirDialogoPrealta();
     });
+    this.recargarTablaAsignaciones();
+
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        filter((e) => e.urlAfterRedirects.includes('/asignaciones')),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => this.recargarTablaAsignaciones());
+  }
+
+  private recargarTablaAsignaciones(): void {
     this.inventario.getAsignaciones().subscribe((list) => {
       this.asignaciones = list;
       this.filtrar();
@@ -224,10 +239,7 @@ export class AsignacionComponent implements OnInit {
         } else {
           this.notificacion.asignacionCreada();
         }
-        this.inventario.getAsignaciones().subscribe((list) => {
-          this.asignaciones = list;
-          this.filtrar();
-        });
+        this.recargarTablaAsignaciones();
         this.inventario.getActivos().subscribe((list) => (this.activos = list));
         this.mostrarDialogo = false;
         this.asignacionEnEdicion = null;
@@ -260,10 +272,7 @@ export class AsignacionComponent implements OnInit {
       next: () => {
         this.cancelarEliminarAsignacion();
         this.notificacion.asignacionEliminada();
-        this.inventario.getAsignaciones().subscribe((list) => {
-          this.asignaciones = list;
-          this.filtrar();
-        });
+        this.recargarTablaAsignaciones();
         this.inventario.getActivos().subscribe((list) => (this.activos = list));
       },
       error: (err: Error) => {
